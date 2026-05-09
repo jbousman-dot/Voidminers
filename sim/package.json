@@ -1,0 +1,12 @@
+{
+  "name": "voidminers-sim",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Headless verification simulator for Void Miners",
+  "main": "index.js",
+  "scripts": {
+    "sim": "node index.js",
+    "sim:all": "node index.js --all",
+    "sim:quick": "node index.js --duration 3600"
+  }
+}
