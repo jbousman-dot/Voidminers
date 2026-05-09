@@ -11,6 +11,8 @@
 <meta name="apple-mobile-web-app-title" content="Void Miners" />
 <link rel="manifest" href="manifest.json" />
 <title>VOID MINERS // Deep Space Idle</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=JetBrains+Mono:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -987,6 +989,7 @@ display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;
 
   <footer>
     <span id="status">// LINK STABLE</span>
+    <span id="cloud-status" style="font-size:9px;color:var(--ink-dim);letter-spacing:0.1em"></span>
     <span style="display:flex;gap:4px">
       <button id="mute-btn" title="Toggle ambient music">♪ ON</button>
       <button id="export-btn" title="Copy save code to clipboard">EXPORT</button>
@@ -1008,6 +1011,66 @@ display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;
 
 <script>
 'use strict';
+
+// ===== FIREBASE + CLOUD SAVES =====
+firebase.initializeApp({
+  apiKey: 'AIzaSyAg4U7a5xGdzotVk4uhBBYHF5Mk6qia5Q0',
+  authDomain: 'voidminers-game.firebaseapp.com',
+  projectId: 'voidminers-game',
+});
+const db = firebase.firestore();
+
+let currentUser = null;
+function getCFUser() {
+  const cookie = document.cookie.split(';').find(c => c.trim().startsWith('CF_Authorization='));
+  if (!cookie) return null;
+  try {
+    const token = cookie.split('=')[1];
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    return { email: payload.email, uid: payload.sub };
+  } catch(e) { return null; }
+}
+
+function getUserDocRef() {
+  if (!currentUser) return null;
+  return db.collection('saves').doc(currentUser.uid);
+}
+
+let cloudSaveAcc = 0;
+const CLOUD_SAVE_INTERVAL = 30000;
+let lastCloudSaveOk = false;
+
+async function cloudSave() {
+  const ref = getUserDocRef();
+  if (!ref) return;
+  try {
+    await ref.set({
+      state: JSON.stringify(state),
+      email: currentUser.email,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      sector: state.sector,
+      era: state.erasUnlocked,
+      ascensions: state.ascendCount,
+    });
+    lastCloudSaveOk = true;
+    const el = document.getElementById('cloud-status');
+    if (el) { el.textContent = 'CLOUD: SAVED'; el.style.color = 'var(--green)'; }
+    setTimeout(() => { if (el) { el.textContent = 'CLOUD: SYNCED'; el.style.color = 'var(--ink-dim)'; } }, 1500);
+  } catch(e) {
+    lastCloudSaveOk = false;
+    console.warn('Cloud save failed:', e);
+  }
+}
+
+async function cloudLoad() {
+  const ref = getUserDocRef();
+  if (!ref) return null;
+  try {
+    const doc = await ref.get();
+    if (!doc.exists) return null;
+    return JSON.parse(doc.data().state);
+  } catch(e) { console.warn('Cloud load failed:', e); return null; }
+}
 
 const SUFFIX = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
 function fmt(n) {
@@ -1265,6 +1328,12 @@ async function save() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch (e) {
     console.warn('Save failed:', e);
+  }
+  // Cloud save on a slower interval
+  cloudSaveAcc += 5000;
+  if (cloudSaveAcc >= CLOUD_SAVE_INTERVAL && currentUser) {
+    cloudSaveAcc = 0;
+    cloudSave();
   }
 }
 async function load() {
@@ -2962,7 +3031,29 @@ try {
 } catch (e) {}
 
 (async function init() {
-  const loaded = await load();
+  // Identify user from Cloudflare Access JWT
+  currentUser = getCFUser();
+
+  // Try cloud load first, then localStorage fallback
+  let loaded = false;
+  if (currentUser) {
+    try {
+      const cloudState = await cloudLoad();
+      if (cloudState) {
+        const fresh = freshState();
+        state = Object.assign(fresh, cloudState);
+        for (const m of MINERS) if (state.miners[m.id] === undefined) state.miners[m.id] = 0;
+        for (const w of WEAPONS) if (state.weapons[w.id] === undefined) state.weapons[w.id] = 0;
+        for (const m of META) if (state.meta[m.id] === undefined) state.meta[m.id] = 0;
+        if (!state.achievements) state.achievements = {};
+        if (!state.autos) state.autos = fresh.autos;
+        loaded = true;
+      }
+    } catch(e) { console.warn('Cloud load failed, trying local:', e); }
+  }
+
+  if (!loaded) loaded = await load();
+
   if (loaded) {
     applyOffline();
     if (!state.enemyMaxHp) spawnNextEnemy();
@@ -2983,11 +3074,13 @@ try {
     checkAchievements();
     renderTabs();
   }, 700);
-  document.getElementById('status').textContent = '// LINK STABLE';
+  document.getElementById('status').textContent = currentUser
+    ? '// ' + currentUser.email.toUpperCase()
+    : '// LOCAL MODE';
 })();
 
-window.addEventListener('pagehide', save);
-document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
+window.addEventListener('pagehide', () => { save(); if (currentUser) cloudSave(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) { save(); if (currentUser) cloudSave(); } });
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
