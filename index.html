@@ -3,12 +3,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <meta name="color-scheme" content="dark" />
 <meta name="theme-color" content="#05060d" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Void Miners" />
+<link rel="manifest" href="manifest.json" />
 <title>VOID MINERS // Deep Space Idle</title>
 <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=JetBrains+Mono:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -28,22 +29,22 @@
     --orange: #ff9f5a;
     --green: #7dffb0;
     --ink: #d8e8ff;
-    --ink-dim: #6f86a8;
+    --ink-dim: #8a9fc0;
     --ok: #7dffb0;
     --bad: #ff5e6c;
     --era-tint: rgba(110, 240, 255, 0);
   }
 
 /* Era visual progression — body absorbs era tint */
-body[data-era=“1”] { –era-tint: rgba(125, 255, 176, 0.04); }
-body[data-era=“2”] { –era-tint: rgba(255, 215, 106, 0.04); }
-body[data-era=“3”] { –era-tint: rgba(180, 138, 255, 0.06); }
-body[data-era=“4”] { –era-tint: rgba(255, 90, 200, 0.08); }
+body[data-era=“1”] { --era-tint: rgba(125, 255, 176, 0.04); }
+body[data-era=“2”] { --era-tint: rgba(255, 215, 106, 0.04); }
+body[data-era=“3”] { --era-tint: rgba(180, 138, 255, 0.06); }
+body[data-era=“4”] { --era-tint: rgba(255, 90, 200, 0.08); }
 
-- { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; overflow: hidden; }
   body {
-  background: var(–bg); color: var(–ink);
+  background: var(--bg); color: var(--ink);
   font-family: ‘JetBrains Mono’, monospace;
   font-size: 14px; user-select: none;
   overscroll-behavior: none;
@@ -70,7 +71,7 @@ radial-gradient(2px 2px at 8% 41%, #fff 99%, transparent 100%),
 radial-gradient(2px 2px at 95% 55%, #fff 99%, transparent 100%),
 radial-gradient(ellipse at 70% 30%, rgba(110, 240, 255, 0.18), transparent 55%),
 radial-gradient(ellipse at 20% 80%, rgba(255, 90, 200, 0.14), transparent 60%),
-var(–bg);
+var(--bg);
 background-size: 400px 400px, 400px 400px, 400px 400px, 400px 400px, 400px 400px, 400px 400px, 400px 400px, 400px 400px, 400px 400px, 400px 400px, 400px 400px, 400px 400px, 400px 400px, 400px 400px, 400px 400px, 400px 400px, 100% 100%, 100% 100%, 100% 100%;
 animation: drift 180s linear infinite;
 }
@@ -105,7 +106,7 @@ mix-blend-mode: screen;
 /* era tint overlay */
 .era-overlay {
 position: fixed; inset: 0; z-index: 1; pointer-events: none;
-background: var(–era-tint);
+background: var(--era-tint);
 transition: background 1.5s ease;
 }
 
@@ -113,13 +114,13 @@ transition: background 1.5s ease;
 position: relative; z-index: 2;
 height: 100dvh; display: flex; flex-direction: column;
 max-width: 540px; margin: 0 auto;
-padding: 6px 6px 0;
+padding: max(6px, env(safe-area-inset-top)) 6px 0;
 }
 
 header {
 flex: 0 0 auto;
-border: 1px solid var(–panel-edge);
-background: var(–panel);
+border: 1px solid var(--panel-edge);
+background: var(--panel);
 backdrop-filter: blur(6px);
 -webkit-backdrop-filter: blur(6px);
 padding: 6px 10px 8px;
@@ -127,33 +128,33 @@ position: relative;
 }
 header::before {
 content: ‘’; position: absolute; top: -1px; left: 12px; right: 12px; height: 1px;
-background: linear-gradient(90deg, transparent, var(–cyan), transparent);
+background: linear-gradient(90deg, transparent, var(--cyan), transparent);
 }
 .title {
 font-family: ‘Major Mono Display’, monospace;
-font-size: 14px; letter-spacing: 0.18em; color: var(–cyan);
+font-size: 14px; letter-spacing: 0.18em; color: var(--cyan);
 text-shadow: 0 0 8px rgba(110, 240, 255, 0.5);
 display: flex; justify-content: space-between; align-items: baseline;
 }
-.title .tier { font-size: 9px; color: var(–magenta); letter-spacing: 0.2em; }
-body[data-era=“1”] .title { color: var(–green); text-shadow: 0 0 8px rgba(125,255,176,0.5); }
-body[data-era=“2”] .title { color: var(–gold); text-shadow: 0 0 8px rgba(255,215,106,0.5); }
-body[data-era=“3”] .title { color: var(–violet); text-shadow: 0 0 8px rgba(180,138,255,0.5); }
-body[data-era=“4”] .title { color: var(–magenta); text-shadow: 0 0 12px rgba(255,90,200,0.7); }
+.title .tier { font-size: 9px; color: var(--magenta); letter-spacing: 0.2em; }
+body[data-era=“1”] .title { color: var(--green); text-shadow: 0 0 8px rgba(125,255,176,0.5); }
+body[data-era=“2”] .title { color: var(--gold); text-shadow: 0 0 8px rgba(255,215,106,0.5); }
+body[data-era=“3”] .title { color: var(--violet); text-shadow: 0 0 8px rgba(180,138,255,0.5); }
+body[data-era=“4”] .title { color: var(--magenta); text-shadow: 0 0 12px rgba(255,90,200,0.7); }
 
 .res-grid {
 display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px 10px;
 margin-top: 4px; font-size: 10px;
 }
 .res-grid .row { display: flex; justify-content: space-between; align-items: baseline; }
-.res-grid .label { color: var(–ink-dim); letter-spacing: 0.1em; font-size: 9px; }
+.res-grid .label { color: var(--ink-dim); letter-spacing: 0.1em; font-size: 10px; }
 .res-grid .val { font-weight: 600; }
-.v-ore { color: var(–cyan); text-shadow: 0 0 6px rgba(110,240,255,0.5); }
-.v-crys { color: var(–magenta); text-shadow: 0 0 6px rgba(255,90,200,0.5); }
-.v-sing { color: var(–gold); text-shadow: 0 0 6px rgba(255,215,106,0.5); }
-.v-dm { color: var(–violet); text-shadow: 0 0 6px rgba(180,138,255,0.5); }
-.v-scrap { color: var(–orange); text-shadow: 0 0 6px rgba(255,159,90,0.5); }
-.rate { font-size: 9px; color: var(–ink-dim); }
+.v-ore { color: var(--cyan); text-shadow: 0 0 6px rgba(110,240,255,0.5); }
+.v-crys { color: var(--magenta); text-shadow: 0 0 6px rgba(255,90,200,0.5); }
+.v-sing { color: var(--gold); text-shadow: 0 0 6px rgba(255,215,106,0.5); }
+.v-dm { color: var(--violet); text-shadow: 0 0 6px rgba(180,138,255,0.5); }
+.v-scrap { color: var(--orange); text-shadow: 0 0 6px rgba(255,159,90,0.5); }
+.rate { font-size: 10px; color: var(--ink-dim); }
 
 /* CORE — gets more rings as era progresses */
 .core {
@@ -162,8 +163,8 @@ margin: 6px 0;
 height: 105px;
 position: relative;
 display: flex; align-items: center; justify-content: center;
-border: 1px solid var(–panel-edge);
-background: radial-gradient(circle at 50% 50%, rgba(110,240,255,0.12), transparent 60%), var(–panel);
+border: 1px solid var(--panel-edge);
+background: radial-gradient(circle at 50% 50%, rgba(110,240,255,0.12), transparent 60%), var(--panel);
 overflow: hidden; cursor: pointer;
 box-shadow: inset 0 0 30px rgba(110, 240, 255, 0.04);
 transition: height 0.3s ease;
@@ -216,17 +217,17 @@ animation: corePulse 3s ease-in-out infinite;
 50% { transform: scale(1.05); }
 }
 .core:active .core-inner { transform: scale(0.92) !important; }
-.core-label { position: absolute; bottom: 5px; left: 10px; font-size: 8px; color: var(–ink-dim); letter-spacing: 0.2em; z-index: 2; }
-.core-tap-power { position: absolute; top: 5px; right: 10px; font-size: 8px; color: var(–cyan); letter-spacing: 0.1em; z-index: 2; }
+.core-label { position: absolute; bottom: 5px; left: 10px; font-size: 10px; color: var(--ink-dim); letter-spacing: 0.2em; z-index: 2; }
+.core-tap-power { position: absolute; top: 5px; right: 10px; font-size: 10px; color: var(--cyan); letter-spacing: 0.1em; z-index: 2; }
 .core.combat-mode .core-label { display: none; }
 .core.combat-mode .core-tap-power { display: none; }
 .core-mode-toggle {
 position: absolute; top: 5px; left: 10px;
-font-size: 8px; letter-spacing: 0.15em; padding: 2px 6px;
-border: 1px solid var(–panel-edge); cursor: pointer;
-color: var(–ink-dim); background: rgba(0,0,0,0.3); z-index: 4;
+font-size: 11px; letter-spacing: 0.15em; padding: 8px 14px; min-height: 36px;
+border: 1px solid var(--panel-edge); cursor: pointer;
+color: var(--ink-dim); background: rgba(0,0,0,0.3); z-index: 4;
 }
-.core-mode-toggle.combat { color: var(–crimson); border-color: var(–crimson); }
+.core-mode-toggle.combat { color: var(--crimson); border-color: var(--crimson); }
 
 .core.combat-mode .core-inner {
 background: radial-gradient(circle at 35% 35%, #ffaaaa, #ff5e6c 30%, #6a1a1a 70%, #1f0808) !important;
@@ -257,10 +258,10 @@ animation: anomalyThrob 1.5s ease-in-out infinite !important;
 position: absolute; inset: 4px 10px auto 80px; z-index: 3;
 display: flex; justify-content: space-between; align-items: baseline;
 }
-.enemy-name { font-size: 11px; color: var(–crimson); letter-spacing: 0.1em; font-weight: 600; text-shadow: 0 0 6px rgba(255,94,108,0.5); }
-.enemy-name.boss { color: var(–gold); text-shadow: 0 0 8px rgba(255,215,106,0.6); }
-.enemy-name.anomaly { color: var(–violet); text-shadow: 0 0 8px rgba(180,138,255,0.7); }
-.enemy-tier { font-size: 9px; color: var(–ink-dim); }
+.enemy-name { font-size: 11px; color: var(--crimson); letter-spacing: 0.1em; font-weight: 600; text-shadow: 0 0 6px rgba(255,94,108,0.5); }
+.enemy-name.boss { color: var(--gold); text-shadow: 0 0 8px rgba(255,215,106,0.6); }
+.enemy-name.anomaly { color: var(--violet); text-shadow: 0 0 8px rgba(180,138,255,0.7); }
+.enemy-tier { font-size: 10px; color: var(--ink-dim); }
 
 /* HP bar — full bottom strip, separated from orb */
 .hp-bar {
@@ -272,7 +273,7 @@ overflow: hidden;
 }
 .hp-fill {
 height: 100%;
-background: linear-gradient(180deg, #ff8d8d 0%, var(–crimson) 50%, #b13441 100%);
+background: linear-gradient(180deg, #ff8d8d 0%, var(--crimson) 50%, #b13441 100%);
 transition: width 0.15s ease;
 box-shadow: 0 0 12px rgba(255,94,108,0.7), inset 0 1px 0 rgba(255,255,255,0.3);
 position: relative;
@@ -282,9 +283,9 @@ content: ‘’; position: absolute; inset: 0;
 background: repeating-linear-gradient(90deg, transparent 0 6px, rgba(255,255,255,0.08) 6px 7px);
 }
 .core.boss-fight .hp-bar { border-color: rgba(255,215,106,0.7); box-shadow: 0 0 14px rgba(255,215,106,0.4), inset 0 0 6px rgba(0,0,0,0.6); }
-.core.boss-fight .hp-fill { background: linear-gradient(180deg, #ffe9a8 0%, var(–gold) 50%, #c89730 100%); box-shadow: 0 0 14px rgba(255,215,106,0.8), inset 0 1px 0 rgba(255,255,255,0.3); }
+.core.boss-fight .hp-fill { background: linear-gradient(180deg, #ffe9a8 0%, var(--gold) 50%, #c89730 100%); box-shadow: 0 0 14px rgba(255,215,106,0.8), inset 0 1px 0 rgba(255,255,255,0.3); }
 .core.anomaly-fight .hp-bar { border-color: rgba(180,138,255,0.7); box-shadow: 0 0 14px rgba(180,138,255,0.4), inset 0 0 6px rgba(0,0,0,0.6); }
-.core.anomaly-fight .hp-fill { background: linear-gradient(180deg, #d8c0ff 0%, var(–violet) 50%, #6e4eb8 100%); box-shadow: 0 0 14px rgba(180,138,255,0.8), inset 0 1px 0 rgba(255,255,255,0.3); }
+.core.anomaly-fight .hp-fill { background: linear-gradient(180deg, #d8c0ff 0%, var(--violet) 50%, #6e4eb8 100%); box-shadow: 0 0 14px rgba(180,138,255,0.8), inset 0 1px 0 rgba(255,255,255,0.3); }
 .hp-text {
 position: absolute; bottom: 9px; left: 0; right: 0; z-index: 4;
 font-size: 10px; color: #fff; letter-spacing: 0.08em; font-weight: 700;
@@ -293,16 +294,16 @@ text-shadow: 0 0 4px rgba(0,0,0,0.9), 0 1px 2px rgba(0,0,0,0.9);
 }
 .dps-text {
 position: absolute; bottom: 28px; right: 10px; z-index: 3;
-font-size: 9px; color: var(–orange); letter-spacing: 0.1em; font-weight: 600;
+font-size: 10px; color: var(--orange); letter-spacing: 0.1em; font-weight: 600;
 text-shadow: 0 0 6px rgba(255,159,90,0.6);
 }
 .float {
 position: absolute; pointer-events: none;
 font-size: 12px; font-weight: 600; text-shadow: 0 0 8px currentColor;
-animation: floatUp 0.9s ease-out forwards; z-index: 5; color: var(–cyan);
+animation: floatUp 0.9s ease-out forwards; z-index: 5; color: var(--cyan);
 }
-.float.dmg { color: var(–orange); }
-.float.crit { color: var(–gold); font-size: 18px; animation: floatUpCrit 1s ease-out forwards; font-weight: 700; }
+.float.dmg { color: var(--orange); }
+.float.crit { color: var(--gold); font-size: 18px; animation: floatUpCrit 1s ease-out forwards; font-weight: 700; }
 @keyframes floatUp {
 0% { transform: translate(-50%, 0); opacity: 1; }
 100% { transform: translate(-50%, -60px); opacity: 0; }
@@ -335,12 +336,12 @@ background: radial-gradient(circle, rgba(255,215,106,0.0) 30%, rgba(0,0,0,0.7) 1
 }
 .boss-entrance .be-name {
 font-family: ‘Major Mono Display’, monospace;
-color: var(–gold); font-size: 32px; letter-spacing: 0.3em;
+color: var(--gold); font-size: 32px; letter-spacing: 0.3em;
 text-shadow: 0 0 20px rgba(255,215,106,1), 0 0 40px rgba(255,215,106,0.6);
 animation: nameSlam 2.5s forwards;
 text-align: center;
 }
-.boss-entrance.anomaly .be-name { color: var(–violet); text-shadow: 0 0 20px rgba(180,138,255,1), 0 0 40px rgba(180,138,255,0.6); }
+.boss-entrance.anomaly .be-name { color: var(--violet); text-shadow: 0 0 20px rgba(180,138,255,1), 0 0 40px rgba(180,138,255,0.6); }
 @keyframes nameSlam {
 0% { transform: scale(0.3) rotate(-5deg); opacity: 0; }
 15% { transform: scale(1.3) rotate(2deg); opacity: 1; }
@@ -350,7 +351,7 @@ text-align: center;
 }
 .boss-entrance .be-sub {
 position: absolute; bottom: 30%; left: 0; right: 0;
-text-align: center; font-size: 11px; color: var(–ink-dim); letter-spacing: 0.4em;
+text-align: center; font-size: 11px; color: var(--ink-dim); letter-spacing: 0.4em;
 animation: subFade 2.5s forwards;
 }
 @keyframes subFade { 0%,30% { opacity: 0; } 50% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
@@ -365,66 +366,73 @@ animation: scanMove 2.5s linear forwards;
 /* TABS */
 .tabs-wrap {
 flex: 0 0 auto; overflow-x: auto; overflow-y: hidden;
-scrollbar-width: none; margin-bottom: 6px;
+scrollbar-width: none; margin-bottom: 6px; position: relative;
 }
 .tabs-wrap::-webkit-scrollbar { display: none; }
+.tabs-wrap::after {
+  content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 30px;
+  background: linear-gradient(to right, transparent, var(--bg-2));
+  pointer-events: none; z-index: 1;
+}
 .tabs { display: flex; gap: 3px; min-width: max-content; }
 .tab {
-background: var(–panel);
-border: 1px solid var(–panel-edge);
-color: var(–ink);
+background: var(--panel);
+border: 1px solid var(--panel-edge);
+color: var(--ink);
 font-family: ‘JetBrains Mono’, monospace;
-font-size: 9px; letter-spacing: 0.12em;
-padding: 8px 11px; cursor: pointer;
+font-size: 10px; letter-spacing: 0.12em;
+padding: 10px 14px; cursor: pointer;
 transition: all 0.15s; text-transform: uppercase;
 white-space: nowrap; flex-shrink: 0;
 font-weight: 600;
 }
 .tab.active {
-color: var(–bg); background: var(–cyan); border-color: var(–cyan);
+color: var(--bg); background: var(--cyan); border-color: var(--cyan);
 box-shadow: 0 0 14px rgba(110,240,255,0.6), inset 0 0 8px rgba(255,255,255,0.3);
 text-shadow: none;
 }
-.tab.combat.active { background: var(–crimson); border-color: var(–crimson); box-shadow: 0 0 14px rgba(255,94,108,0.6), inset 0 0 8px rgba(255,255,255,0.3); }
-.tab.expedition.active { background: var(–green); border-color: var(–green); box-shadow: 0 0 14px rgba(125,255,176,0.6), inset 0 0 8px rgba(255,255,255,0.3); }
-.tab.research.active { background: var(–gold); border-color: var(–gold); box-shadow: 0 0 14px rgba(255,215,106,0.6), inset 0 0 8px rgba(255,255,255,0.3); }
-.tab.anomaly.active { background: var(–violet); border-color: var(–violet); box-shadow: 0 0 14px rgba(180,138,255,0.6), inset 0 0 8px rgba(255,255,255,0.3); }
+.tab.combat.active { background: var(--crimson); border-color: var(--crimson); box-shadow: 0 0 14px rgba(255,94,108,0.6), inset 0 0 8px rgba(255,255,255,0.3); }
+.tab.expedition.active { background: var(--green); border-color: var(--green); box-shadow: 0 0 14px rgba(125,255,176,0.6), inset 0 0 8px rgba(255,255,255,0.3); }
+.tab.research.active { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 14px rgba(255,215,106,0.6), inset 0 0 8px rgba(255,255,255,0.3); }
+.tab.anomaly.active { background: var(--violet); border-color: var(--violet); box-shadow: 0 0 14px rgba(180,138,255,0.6), inset 0 0 8px rgba(255,255,255,0.3); }
 .tab .badge {
 display: inline-block; min-width: 12px; padding: 0 3px;
-background: var(–magenta); color: #fff; font-size: 8px;
+background: var(--magenta); color: #fff; font-size: 9px;
 border-radius: 2px; margin-left: 2px;
 }
 .tab.locked { opacity: 0.3; cursor: not-allowed; }
-.tab .badge.violet { background: var(–violet); animation: badgePulse 1.2s infinite; }
-.tab .badge.green { background: var(–green); color: #000; }
-@keyframes badgePulse { 0%,100% { opacity: 1; box-shadow: 0 0 8px var(–violet); } 50% { opacity: 0.7; } }
+.tab .badge.violet { background: var(--violet); animation: badgePulse 1.2s infinite; }
+.tab .badge.green { background: var(--green); color: #000; }
+.tab .badge.gold { background: var(--gold); color: #000; }
+.tab .badge { white-space: nowrap; }
+@keyframes badgePulse { 0%,100% { opacity: 1; box-shadow: 0 0 8px var(--violet); } 50% { opacity: 0.7; } }
 
 .panel {
 flex: 1 1 auto; overflow-y: auto; overflow-x: hidden;
-border: 1px solid var(–panel-edge);
-background: var(–panel);
+border: 1px solid var(--panel-edge);
+background: var(--panel);
 padding: 10px;
 margin-bottom: 6px;
 scrollbar-width: thin;
-scrollbar-color: var(–cyan-dim) transparent;
+scrollbar-color: var(--cyan-dim) transparent;
 box-shadow: inset 0 0 30px rgba(110, 240, 255, 0.04), 0 0 12px rgba(110, 240, 255, 0.05);
 }
 .panel::-webkit-scrollbar { width: 4px; }
-.panel::-webkit-scrollbar-thumb { background: var(–cyan-dim); }
+.panel::-webkit-scrollbar-thumb { background: var(--cyan-dim); }
 
 .section-title {
 font-family: ‘Major Mono Display’, monospace;
 font-size: 11px; letter-spacing: 0.2em;
-color: var(–cyan); margin-bottom: 10px; padding-bottom: 6px;
+color: var(--cyan); margin-bottom: 10px; padding-bottom: 6px;
 border-bottom: 1px dashed rgba(110,240,255,0.4);
 display: flex; justify-content: space-between;
 text-shadow: 0 0 8px rgba(110,240,255,0.4);
 }
-.section-title.combat { color: var(–crimson); border-color: rgba(255,94,108,0.45); text-shadow: 0 0 8px rgba(255,94,108,0.4); }
-.section-title.exp { color: var(–green); border-color: rgba(125,255,176,0.45); text-shadow: 0 0 8px rgba(125,255,176,0.4); }
-.section-title.research { color: var(–gold); border-color: rgba(255,215,106,0.45); text-shadow: 0 0 8px rgba(255,215,106,0.4); }
-.section-title.anomaly { color: var(–violet); border-color: rgba(180,138,255,0.45); text-shadow: 0 0 8px rgba(180,138,255,0.4); }
-.section-title .sub { color: var(–ink-dim); font-size: 10px; letter-spacing: 0.1em; text-shadow: none; }
+.section-title.combat { color: var(--crimson); border-color: rgba(255,94,108,0.45); text-shadow: 0 0 8px rgba(255,94,108,0.4); }
+.section-title.exp { color: var(--green); border-color: rgba(125,255,176,0.45); text-shadow: 0 0 8px rgba(125,255,176,0.4); }
+.section-title.research { color: var(--gold); border-color: rgba(255,215,106,0.45); text-shadow: 0 0 8px rgba(255,215,106,0.4); }
+.section-title.anomaly { color: var(--violet); border-color: rgba(180,138,255,0.45); text-shadow: 0 0 8px rgba(180,138,255,0.4); }
+.section-title .sub { color: var(--ink-dim); font-size: 10px; letter-spacing: 0.1em; text-shadow: none; }
 
 .item {
 border: 1px solid rgba(110,240,255,0.28);
@@ -449,18 +457,18 @@ box-shadow: 0 0 10px rgba(255,159,90,0.18), inset 0 1px 0 rgba(255,159,90,0.1);
 }
 .item.cant { opacity: 0.55; }
 .item .name { font-weight: 600; font-size: 12px; letter-spacing: 0.05em; }
-.item.weapon .name { color: var(–orange); }
-.item .desc { font-size: 10px; color: var(–ink-dim); margin-top: 2px; }
-.item .qty { color: var(–gold); font-size: 10px; margin-top: 2px; }
+.item.weapon .name { color: var(--orange); }
+.item .desc { font-size: 10px; color: var(--ink-dim); margin-top: 2px; }
+.item .qty { color: var(--gold); font-size: 10px; margin-top: 2px; }
 .item .buy { text-align: right; font-size: 11px; }
-.item .buy .cost { color: var(–cyan); font-weight: 600; font-size: 11px; }
-.item.weapon .buy .cost { color: var(–orange); }
-.item.cant .buy .cost { color: var(–bad); }
-.item .buy .label { color: var(–ink-dim); font-size: 8px; letter-spacing: 0.15em; }
+.item .buy .cost { color: var(--cyan); font-weight: 600; font-size: 11px; }
+.item.weapon .buy .cost { color: var(--orange); }
+.item.cant .buy .cost { color: var(--bad); }
+.item .buy .label { color: var(--ink-dim); font-size: 10px; letter-spacing: 0.15em; }
 
 /* PRESTIGE */
 .prestige-box {
-border: 1px solid var(–panel-edge); padding: 12px; margin-bottom: 10px; position: relative;
+border: 1px solid var(--panel-edge); padding: 12px; margin-bottom: 10px; position: relative;
 }
 .prestige-box.refine {
 border-color: rgba(255,90,200,0.55);
@@ -478,23 +486,23 @@ background: linear-gradient(180deg, rgba(180,138,255,0.14) 0%, rgba(180,138,255,
 box-shadow: 0 0 14px rgba(180,138,255,0.1), inset 0 1px 0 rgba(180,138,255,0.1);
 }
 .prestige-box h3 { font-family: ‘Major Mono Display’, monospace; font-size: 12px; letter-spacing: 0.2em; margin-bottom: 6px; }
-.prestige-box.refine h3 { color: var(–magenta); text-shadow: 0 0 10px rgba(255,90,200,0.6); }
-.prestige-box.warp h3 { color: var(–gold); text-shadow: 0 0 10px rgba(255,215,106,0.6); }
-.prestige-box.ascend h3 { color: var(–violet); text-shadow: 0 0 10px rgba(180,138,255,0.6); }
-.prestige-box p { font-size: 10px; color: var(–ink-dim); margin-bottom: 8px; line-height: 1.5; }
+.prestige-box.refine h3 { color: var(--magenta); text-shadow: 0 0 10px rgba(255,90,200,0.6); }
+.prestige-box.warp h3 { color: var(--gold); text-shadow: 0 0 10px rgba(255,215,106,0.6); }
+.prestige-box.ascend h3 { color: var(--violet); text-shadow: 0 0 10px rgba(180,138,255,0.6); }
+.prestige-box p { font-size: 10px; color: var(--ink-dim); margin-bottom: 8px; line-height: 1.5; }
 .prestige-box .gain { font-size: 11px; margin-bottom: 8px; }
 .prestige-box .gain b { font-size: 16px; }
 .prestige-box .gate {
-background: rgba(255,94,108,0.15); border: 1px dashed rgba(255,94,108,0.55); color: var(–crimson);
+background: rgba(255,94,108,0.15); border: 1px dashed rgba(255,94,108,0.55); color: var(--crimson);
 padding: 6px 9px; margin-bottom: 8px; font-size: 10px; letter-spacing: 0.1em;
 text-shadow: 0 0 6px rgba(255,94,108,0.4);
 }
 .prestige-box .gate.cleared {
-background: rgba(125,255,176,0.13); border-color: rgba(125,255,176,0.55); color: var(–ok);
+background: rgba(125,255,176,0.13); border-color: rgba(125,255,176,0.55); color: var(--ok);
 text-shadow: 0 0 6px rgba(125,255,176,0.5);
 }
 .prestige-box .auto-status {
-background: rgba(125,255,176,0.10); border: 1px solid rgba(125,255,176,0.4); color: var(–green);
+background: rgba(125,255,176,0.10); border: 1px solid rgba(125,255,176,0.4); color: var(--green);
 padding: 6px 9px; margin-bottom: 6px; font-size: 10px; letter-spacing: 0.1em;
 display: flex; justify-content: space-between; align-items: center;
 }
@@ -502,36 +510,36 @@ display: flex; justify-content: space-between; align-items: center;
 .btn {
 width: 100%; padding: 9px; cursor: pointer;
 font-family: ‘JetBrains Mono’, monospace; font-size: 11px; letter-spacing: 0.2em;
-background: transparent; color: var(–ink); border: 1px solid var(–ink-dim);
+background: transparent; color: var(--ink); border: 1px solid var(--ink-dim);
 text-transform: uppercase; transition: all 0.15s;
 }
-.btn.go.refine { border-color: var(–magenta); color: var(–magenta); }
-.btn.go.refine:hover:not(:disabled) { background: var(–magenta); color: var(–bg); box-shadow: 0 0 16px rgba(255,90,200,0.5); }
-.btn.go.warp { border-color: var(–gold); color: var(–gold); }
-.btn.go.warp:hover:not(:disabled) { background: var(–gold); color: var(–bg); box-shadow: 0 0 16px rgba(255,215,106,0.5); }
-.btn.go.ascend { border-color: var(–violet); color: var(–violet); }
-.btn.go.ascend:hover:not(:disabled) { background: var(–violet); color: var(–bg); box-shadow: 0 0 16px rgba(180,138,255,0.5); }
-.btn.go.combat { border-color: var(–crimson); color: var(–crimson); }
-.btn.go.combat:hover:not(:disabled) { background: var(–crimson); color: var(–bg); box-shadow: 0 0 16px rgba(255,94,108,0.5); }
-.btn.go.green { border-color: var(–green); color: var(–green); }
-.btn.go.green:hover:not(:disabled) { background: var(–green); color: var(–bg); box-shadow: 0 0 16px rgba(125,255,176,0.5); }
+.btn.go.refine { border-color: var(--magenta); color: var(--magenta); }
+@media (hover: hover) { .btn.go.refine:hover:not(:disabled) { background: var(--magenta); color: var(--bg); box-shadow: 0 0 16px rgba(255,90,200,0.5); } }
+.btn.go.warp { border-color: var(--gold); color: var(--gold); }
+@media (hover: hover) { .btn.go.warp:hover:not(:disabled) { background: var(--gold); color: var(--bg); box-shadow: 0 0 16px rgba(255,215,106,0.5); } }
+.btn.go.ascend { border-color: var(--violet); color: var(--violet); }
+@media (hover: hover) { .btn.go.ascend:hover:not(:disabled) { background: var(--violet); color: var(--bg); box-shadow: 0 0 16px rgba(180,138,255,0.5); } }
+.btn.go.combat { border-color: var(--crimson); color: var(--crimson); }
+@media (hover: hover) { .btn.go.combat:hover:not(:disabled) { background: var(--crimson); color: var(--bg); box-shadow: 0 0 16px rgba(255,94,108,0.5); } }
+.btn.go.green { border-color: var(--green); color: var(--green); }
+@media (hover: hover) { .btn.go.green:hover:not(:disabled) { background: var(--green); color: var(--bg); box-shadow: 0 0 16px rgba(125,255,176,0.5); } }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.btn.small { padding: 5px 10px; font-size: 9px; width: auto; }
+.btn.small { padding: 8px 14px; font-size: 10px; width: auto; }
 
 /* META — era cards */
 .era-card {
-border: 2px solid var(–panel-edge);
+border: 2px solid var(--panel-edge);
 padding: 12px; margin-bottom: 10px; position: relative;
 overflow: hidden;
 }
 .era-card.unlocked {
-border-color: var(–violet);
+border-color: var(--violet);
 background:
 linear-gradient(180deg, rgba(180,138,255,0.10), rgba(180,138,255,0.02)),
 repeating-linear-gradient(45deg, rgba(180,138,255,0.04) 0 2px, transparent 2px 8px);
 }
 .era-card.active-era {
-border-color: var(–gold);
+border-color: var(--gold);
 background: linear-gradient(180deg, rgba(255,215,106,0.10), transparent);
 box-shadow: 0 0 16px rgba(255,215,106,0.2);
 animation: eraGlow 3s ease-in-out infinite;
@@ -543,49 +551,49 @@ animation: eraGlow 3s ease-in-out infinite;
 .era-card.locked { opacity: 0.5; }
 .era-card h3 {
 font-family: ‘Major Mono Display’, monospace; font-size: 12px; letter-spacing: 0.2em;
-color: var(–violet); margin-bottom: 4px;
+color: var(--violet); margin-bottom: 4px;
 }
-.era-card.locked h3 { color: var(–ink-dim); }
-.era-card.active-era h3 { color: var(–gold); }
-.era-card .desc { font-size: 10px; color: var(–ink-dim); margin-bottom: 8px; line-height: 1.5; }
-.era-card .feature-list { font-size: 10px; color: var(–green); margin-bottom: 8px; line-height: 1.7; }
+.era-card.locked h3 { color: var(--ink-dim); }
+.era-card.active-era h3 { color: var(--gold); }
+.era-card .desc { font-size: 10px; color: var(--ink-dim); margin-bottom: 8px; line-height: 1.5; }
+.era-card .feature-list { font-size: 10px; color: var(--green); margin-bottom: 8px; line-height: 1.7; }
 .era-card .feature-list .ft { display: block; margin-left: 8px; }
 .era-card .cost-line { font-size: 10px; margin-bottom: 6px; }
 .era-card .era-num {
 position: absolute; top: 8px; right: 12px;
 font-family: ‘Major Mono Display’, monospace;
 font-size: 36px; opacity: 0.1; line-height: 1;
-color: var(–violet);
+color: var(--violet);
 }
-.era-card.active-era .era-num { color: var(–gold); opacity: 0.18; }
+.era-card.active-era .era-num { color: var(--gold); opacity: 0.18; }
 
 /* TOAST */
 #toast {
-position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
-background: var(–bg-2); border: 1px solid var(–cyan); color: var(–cyan);
+position: fixed; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%);
+background: var(--bg-2); border: 1px solid var(--cyan); color: var(--cyan);
 padding: 10px 18px; font-size: 11px; letter-spacing: 0.15em; z-index: 100;
 box-shadow: 0 0 20px rgba(110,240,255,0.3);
 opacity: 0; pointer-events: none; transition: opacity 0.3s; text-transform: uppercase;
 max-width: 90vw; text-align: center;
 }
 #toast.show { opacity: 1; }
-#toast.bad { border-color: var(–crimson); color: var(–crimson); }
-#toast.gold { border-color: var(–gold); color: var(–gold); }
-#toast.green { border-color: var(–green); color: var(–green); }
-#toast.violet { border-color: var(–violet); color: var(–violet); box-shadow: 0 0 20px rgba(180,138,255,0.4); }
+#toast.bad { border-color: var(--crimson); color: var(--crimson); }
+#toast.gold { border-color: var(--gold); color: var(--gold); }
+#toast.green { border-color: var(--green); color: var(--green); }
+#toast.violet { border-color: var(--violet); color: var(--violet); box-shadow: 0 0 20px rgba(180,138,255,0.4); }
 
 footer {
 flex: 0 0 auto;
 display: flex; justify-content: space-between; align-items: center;
-padding: 4px 4px 6px;
-font-size: 9px; color: var(–ink-dim); letter-spacing: 0.15em;
+padding: 6px 6px calc(8px + env(safe-area-inset-bottom, 0px));
+font-size: 10px; color: var(--ink-dim); letter-spacing: 0.15em;
 }
 footer button {
-background: transparent; border: 1px solid var(–ink-dim);
-color: var(–ink-dim); padding: 4px 8px; font-size: 9px;
+background: transparent; border: 1px solid var(--ink-dim);
+color: var(--ink-dim); padding: 8px 12px; font-size: 10px;
 font-family: inherit; letter-spacing: 0.15em; cursor: pointer; text-transform: uppercase;
 }
-footer button:hover { color: var(–bad); border-color: var(–bad); }
+@media (hover: hover) { footer button:hover { color: var(--bad); border-color: var(--bad); } }
 
 /* MODALS */
 .modal-bg {
@@ -596,29 +604,29 @@ animation: modalFadeIn 0.3s ease-out;
 }
 @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
 .modal {
-border: 1px solid var(–cyan); background: var(–bg-2);
+border: 1px solid var(--cyan); background: var(--bg-2);
 padding: 20px; max-width: 380px; width: 100%; text-align: center;
 animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 @keyframes modalSlideIn { from { transform: translateY(20px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
-.modal h2 { font-family: ‘Major Mono Display’, monospace; color: var(–cyan); font-size: 14px; letter-spacing: 0.2em; margin-bottom: 10px; }
-.modal.boss h2 { color: var(–gold); }
-.modal.victory h2 { color: var(–ok); }
-.modal.era h2 { color: var(–violet); }
-.modal.anomaly h2 { color: var(–violet); }
-.modal p { font-size: 11px; color: var(–ink-dim); margin-bottom: 8px; line-height: 1.6; }
-.modal .reward { font-size: 16px; color: var(–cyan); margin: 12px 0; }
-.modal.boss .reward, .modal.victory .reward { color: var(–gold); }
-.modal.anomaly { border-color: var(–violet); }
+.modal h2 { font-family: ‘Major Mono Display’, monospace; color: var(--cyan); font-size: 14px; letter-spacing: 0.2em; margin-bottom: 10px; }
+.modal.boss h2 { color: var(--gold); }
+.modal.victory h2 { color: var(--ok); }
+.modal.era h2 { color: var(--violet); }
+.modal.anomaly h2 { color: var(--violet); }
+.modal p { font-size: 11px; color: var(--ink-dim); margin-bottom: 8px; line-height: 1.6; }
+.modal .reward { font-size: 16px; color: var(--cyan); margin: 12px 0; }
+.modal.boss .reward, .modal.victory .reward { color: var(--gold); }
+.modal.anomaly { border-color: var(--violet); }
 .modal.era {
-border-color: var(–violet);
+border-color: var(--violet);
 background:
-linear-gradient(180deg, var(–bg-2), rgba(20, 10, 40, 0.95)),
+linear-gradient(180deg, var(--bg-2), rgba(20, 10, 40, 0.95)),
 radial-gradient(circle at 50% 0%, rgba(180,138,255,0.25), transparent 60%);
 }
 .modal.era .era-num-big {
 font-family: ‘Major Mono Display’, monospace;
-font-size: 64px; color: var(–violet);
+font-size: 64px; color: var(--violet);
 text-shadow: 0 0 30px rgba(180,138,255,0.7);
 margin: 10px 0;
 animation: eraNumberGlow 2s ease-in-out infinite alternate;
@@ -632,18 +640,18 @@ text-align: left; line-height: 1.9;
 padding: 12px; margin: 14px 0;
 border: 1px dashed rgba(180,138,255,0.4);
 background: rgba(180,138,255,0.04);
-font-size: 11px; color: var(–green);
+font-size: 11px; color: var(--green);
 }
 
 /* unlocks */
 .unlock {
 border: 1px solid rgba(125,255,176,0.2); background: rgba(125,255,176,0.04);
 padding: 5px 10px; margin-bottom: 4px;
-font-size: 10px; color: var(–ok); letter-spacing: 0.1em;
+font-size: 10px; color: var(--ok); letter-spacing: 0.1em;
 display: flex; justify-content: space-between;
 }
-.unlock.locked { border-color: rgba(255,94,108,0.2); background: rgba(255,94,108,0.04); color: var(–ink-dim); }
-.unlock.violet { border-color: rgba(180,138,255,0.3); background: rgba(180,138,255,0.06); color: var(–violet); }
+.unlock.locked { border-color: rgba(255,94,108,0.2); background: rgba(255,94,108,0.04); color: var(--ink-dim); }
+.unlock.violet { border-color: rgba(180,138,255,0.3); background: rgba(180,138,255,0.06); color: var(--violet); }
 
 /* EXPEDITIONS */
 .expedition-card {
@@ -651,23 +659,23 @@ border: 1px solid rgba(125,255,176,0.25);
 background: linear-gradient(180deg, rgba(125,255,176,0.04), transparent);
 padding: 10px; margin-bottom: 8px; position: relative; overflow: hidden;
 }
-.expedition-card .ex-name { font-size: 12px; color: var(–green); letter-spacing: 0.1em; font-weight: 600; }
+.expedition-card .ex-name { font-size: 12px; color: var(--green); letter-spacing: 0.1em; font-weight: 600; }
 .expedition-card .ex-icon {
 position: absolute; top: 8px; right: 10px;
 font-size: 24px; opacity: 0.25; line-height: 1;
-font-family: ‘Major Mono Display’, monospace; color: var(–green);
+font-family: ‘Major Mono Display’, monospace; color: var(--green);
 }
-.expedition-card .ex-desc { font-size: 10px; color: var(–ink-dim); margin: 3px 0 6px; }
+.expedition-card .ex-desc { font-size: 10px; color: var(--ink-dim); margin: 3px 0 6px; }
 .expedition-card .ex-row { display: flex; justify-content: space-between; align-items: center; font-size: 10px; margin-top: 4px; }
 .ex-progress {
 height: 4px; background: rgba(125,255,176,0.15); border: 1px solid rgba(125,255,176,0.3);
 margin: 6px 0;
 }
 .ex-progress-fill {
-height: 100%; background: var(–green); transition: width 0.3s ease;
+height: 100%; background: var(--green); transition: width 0.3s ease;
 box-shadow: 0 0 6px rgba(125,255,176,0.5);
 }
-.ex-active { border-color: var(–green); box-shadow: 0 0 10px rgba(125,255,176,0.15); }
+.ex-active { border-color: var(--green); box-shadow: 0 0 10px rgba(125,255,176,0.15); }
 
 /* RESEARCH */
 .research-grid {
@@ -682,21 +690,21 @@ position: relative; min-height: 78px;
 display: flex; flex-direction: column; justify-content: space-between;
 }
 .research-node.purchased {
-border-color: var(–gold);
+border-color: var(--gold);
 background: linear-gradient(180deg, rgba(255,215,106,0.18), transparent);
 box-shadow: 0 0 8px rgba(255,215,106,0.2);
 }
 .research-node.affordable { border-color: rgba(255,215,106,0.7); }
-.research-node.affordable:hover { background: rgba(255,215,106,0.12); }
+@media (hover: hover) { .research-node.affordable:hover { background: rgba(255,215,106,0.12); } }
 .research-node.locked { opacity: 0.4; cursor: not-allowed; }
-.research-node .rn-name { font-size: 9px; font-weight: 600; color: var(–gold); letter-spacing: 0.05em; }
-.research-node.purchased .rn-name::before { content: ’◆ ’; color: var(–gold); }
-.research-node .rn-desc { font-size: 8px; color: var(–ink-dim); margin-top: 3px; line-height: 1.3; }
-.research-node .rn-cost { font-size: 9px; color: var(–gold); margin-top: 4px; }
-.research-node.purchased .rn-cost { color: var(–green); }
+.research-node .rn-name { font-size: 10px; font-weight: 600; color: var(--gold); letter-spacing: 0.05em; }
+.research-node.purchased .rn-name::before { content: ’◆ ’; color: var(--gold); }
+.research-node .rn-desc { font-size: 10px; color: var(--ink-dim); margin-top: 3px; line-height: 1.3; }
+.research-node .rn-cost { font-size: 10px; color: var(--gold); margin-top: 4px; }
+.research-node.purchased .rn-cost { color: var(--green); }
 .research-tree-col {
 font-family: ‘Major Mono Display’, monospace; font-size: 10px; letter-spacing: 0.15em;
-color: var(–gold); margin-bottom: 6px; text-align: center; padding-bottom: 2px;
+color: var(--gold); margin-bottom: 6px; text-align: center; padding-bottom: 2px;
 border-bottom: 1px dashed rgba(255,215,106,0.2);
 }
 
@@ -716,45 +724,45 @@ to { transform: scale(1); opacity: 1; }
 background:
 linear-gradient(180deg, rgba(255,159,90,0.12), transparent 70%),
 radial-gradient(circle at 30% 30%, rgba(255,159,90,0.18), transparent 60%);
-border-color: var(–orange);
+border-color: var(--orange);
 }
-.anomaly-card[data-type=“flare”] .a-name { color: var(–orange); }
+.anomaly-card[data-type=“flare”] .a-name { color: var(--orange); }
 .anomaly-card[data-type=“storm”] {
 background:
 linear-gradient(180deg, rgba(110,240,255,0.10), transparent 70%),
 radial-gradient(circle at 70% 30%, rgba(180,138,255,0.20), transparent 60%);
-border-color: var(–cyan);
+border-color: var(--cyan);
 }
-.anomaly-card[data-type=“storm”] .a-name { color: var(–cyan); }
+.anomaly-card[data-type=“storm”] .a-name { color: var(--cyan); }
 .anomaly-card[data-type=“rift”] {
 background:
 linear-gradient(180deg, rgba(125,255,176,0.10), transparent 70%),
 radial-gradient(ellipse at 50% 30%, rgba(125,255,176,0.18), transparent 70%);
-border-color: var(–green);
+border-color: var(--green);
 }
-.anomaly-card[data-type=“rift”] .a-name { color: var(–green); }
+.anomaly-card[data-type=“rift”] .a-name { color: var(--green); }
 .anomaly-card[data-type=“cache”] {
 background:
 linear-gradient(180deg, rgba(255,215,106,0.10), transparent 70%),
 radial-gradient(circle at 50% 60%, rgba(255,215,106,0.18), transparent 60%);
-border-color: var(–gold);
+border-color: var(--gold);
 }
-.anomaly-card[data-type=“cache”] .a-name { color: var(–gold); }
+.anomaly-card[data-type=“cache”] .a-name { color: var(--gold); }
 .anomaly-card .a-icon {
 position: absolute; top: 8px; right: 14px;
 font-family: ‘Major Mono Display’, monospace; font-size: 36px;
 opacity: 0.18; line-height: 1;
 }
 .anomaly-card .a-name { font-family: ‘Major Mono Display’, monospace; font-size: 13px; letter-spacing: 0.2em; }
-.anomaly-card .a-timer { font-size: 10px; color: var(–bad); letter-spacing: 0.1em; font-weight: 600; }
-.anomaly-card .a-desc { font-size: 11px; color: var(–ink); margin: 8px 0; line-height: 1.5; }
+.anomaly-card .a-timer { font-size: 10px; color: var(--bad); letter-spacing: 0.1em; font-weight: 600; }
+.anomaly-card .a-desc { font-size: 11px; color: var(--ink); margin: 8px 0; line-height: 1.5; }
 .anomaly-card .a-choice { display: flex; gap: 6px; margin-top: 8px; }
 
 /* radar empty state */
 .radar-empty {
 border: 1px dashed rgba(180,138,255,0.3);
 padding: 24px 12px; margin-bottom: 14px;
-text-align: center; color: var(–ink-dim);
+text-align: center; color: var(--ink-dim);
 font-size: 10px; line-height: 1.8; letter-spacing: 0.1em;
 position: relative; overflow: hidden;
 }
@@ -782,42 +790,76 @@ cursor: pointer; transition: all 0.18s;
 background: linear-gradient(180deg, rgba(180,138,255,0.04), transparent);
 position: relative; overflow: hidden;
 }
-.modifier-card:hover:not(.disabled) { border-color: rgba(180,138,255,0.6); background: rgba(180,138,255,0.08); }
+@media (hover: hover) { .modifier-card:hover:not(.disabled) { border-color: rgba(180,138,255,0.6); background: rgba(180,138,255,0.08); } }
 .modifier-card.selected {
-border-color: var(–violet);
+border-color: var(--violet);
 background: rgba(180,138,255,0.20);
 box-shadow: 0 0 12px rgba(180,138,255,0.4);
 }
 .modifier-card.selected::before {
 content: ‘◉’; position: absolute; top: 8px; right: 10px;
-color: var(–violet); font-size: 14px;
+color: var(--violet); font-size: 14px;
 }
 .modifier-card.disabled { opacity: 0.4; cursor: not-allowed; }
-.modifier-card .m-name { font-size: 11px; color: var(–violet); font-weight: 600; letter-spacing: 0.05em; }
+.modifier-card .m-name { font-size: 11px; color: var(--violet); font-weight: 600; letter-spacing: 0.05em; }
 .modifier-card .m-tag {
-display: inline-block; font-size: 8px; padding: 1px 5px;
-border: 1px solid var(–ink-dim); color: var(–ink-dim);
+display: inline-block; font-size: 9px; padding: 1px 5px;
+border: 1px solid var(--ink-dim); color: var(--ink-dim);
 margin-left: 6px; letter-spacing: 0.1em;
 }
-.modifier-card .m-tag.offensive { border-color: var(–crimson); color: var(–crimson); }
-.modifier-card .m-tag.economic { border-color: var(–cyan); color: var(–cyan); }
-.modifier-card .m-tag.tradeoff { border-color: var(–orange); color: var(–orange); }
-.modifier-card .m-tag.utility { border-color: var(–green); color: var(–green); }
-.modifier-card .m-effect { font-size: 9px; color: var(–ink-dim); margin-top: 4px; line-height: 1.5; }
+.modifier-card .m-tag.offensive { border-color: var(--crimson); color: var(--crimson); }
+.modifier-card .m-tag.economic { border-color: var(--cyan); color: var(--cyan); }
+.modifier-card .m-tag.tradeoff { border-color: var(--orange); color: var(--orange); }
+.modifier-card .m-tag.utility { border-color: var(--green); color: var(--green); }
+.modifier-card .m-effect { font-size: 10px; color: var(--ink-dim); margin-top: 4px; line-height: 1.5; }
 
 /* AUTO-strategy chips */
 .strategy-chips { display: flex; gap: 4px; margin: 6px 0; flex-wrap: wrap; }
 .strategy-chip {
-padding: 4px 8px; font-size: 9px; letter-spacing: 0.1em; cursor: pointer;
-border: 1px solid var(–panel-edge); color: var(–ink-dim);
+padding: 8px 12px; font-size: 10px; letter-spacing: 0.1em; cursor: pointer;
+border: 1px solid var(--panel-edge); color: var(--ink-dim);
 background: rgba(0,0,0,0.2); transition: all 0.15s;
 }
-.strategy-chip.active { background: var(–green); color: var(–bg); border-color: var(–green); }
+.strategy-chip.active { background: var(--green); color: var(--bg); border-color: var(--green); }
+
+/* ACHIEVEMENTS */
+.achv-card {
+border: 1px solid rgba(110,240,255,0.2); padding: 8px 10px; margin-bottom: 6px;
+display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center;
+background: linear-gradient(180deg, rgba(110,240,255,0.04) 0%, transparent 100%);
+opacity: 0.45;
+}
+.achv-card.unlocked {
+opacity: 1; border-color: rgba(125,255,176,0.6);
+background: linear-gradient(180deg, rgba(125,255,176,0.10) 0%, rgba(125,255,176,0.02) 100%);
+box-shadow: 0 0 10px rgba(125,255,176,0.12);
+}
+.achv-card .achv-icon { font-size: 18px; width: 28px; text-align: center; }
+.achv-card .achv-name { font-weight: 600; font-size: 11px; letter-spacing: 0.05em; }
+.achv-card.unlocked .achv-name { color: var(--green); }
+.achv-card .achv-desc { font-size: 10px; color: var(--ink-dim); margin-top: 1px; }
+.achv-card .achv-reward { font-size: 10px; color: var(--gold); margin-top: 2px; letter-spacing: 0.1em; }
+.achv-card .achv-status { font-size: 10px; letter-spacing: 0.15em; text-align: right; }
+.achv-card.unlocked .achv-status { color: var(--green); }
+
+/* BULK BUY */
+.bulk-btn { min-width: 40px; min-height: 36px; }
+
+/* PRESTIGE PARTICLES */
+.prestige-particle {
+position: fixed; width: 6px; height: 6px; border-radius: 50%;
+pointer-events: none; z-index: 99;
+animation: particleBurst 0.8s ease-out forwards;
+}
+@keyframes particleBurst {
+0% { transform: translate(0,0) scale(1); opacity: 1; }
+100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+}
 
 .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
-.dot.green { background: var(–green); box-shadow: 0 0 6px var(–green); }
-.dot.red { background: var(–bad); }
-.dot.violet { background: var(–violet); box-shadow: 0 0 6px var(–violet); }
+.dot.green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.dot.red { background: var(--bad); }
+.dot.violet { background: var(--violet); box-shadow: 0 0 6px var(--violet); }
 
 .auto-toggle-row {
 border: 1px solid rgba(125,255,176,0.3);
@@ -827,6 +869,72 @@ padding: 8px; margin-bottom: 8px;
 .auto-toggle-row .row-top {
 display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.research-node { overflow: hidden; word-break: break-word; }
+.be-name { max-width: 90vw; word-break: break-word; }
+.a-choice { flex-wrap: wrap; }
+.expedition-card { padding-right: 40px; }
+
+.panel > * { animation: panelFadeIn 0.15s ease-out; }
+@keyframes panelFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.item.just-bought { animation: buyFlash 0.3s ease-out; }
+@keyframes buyFlash { 0% { box-shadow: inset 0 0 20px rgba(110,240,255,0.4); } 100% { box-shadow: none; } }
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .core { height: 70px; }
+  .core.combat-mode { height: 90px; padding-bottom: 20px; }
+  .core-inner { width: 50px; height: 50px; }
+  #app { padding-top: 4px; }
+}
+
+.onboard-hint {
+  position: absolute; inset: 0; z-index: 6;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.onboard-hint .onboard-text {
+  font-family: 'Major Mono Display', monospace;
+  font-size: 14px; color: var(--cyan); letter-spacing: 0.3em;
+  text-shadow: 0 0 12px rgba(110,240,255,0.8);
+  animation: onboardPulse 1.5s ease-in-out infinite;
+}
+.onboard-ring {
+  position: absolute; inset: -4px; z-index: 2;
+  border: 2px solid rgba(110,240,255,0.6);
+  animation: onboardRing 2s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes onboardPulse {
+  0%,100% { opacity: 0.6; } 50% { opacity: 1; }
+}
+@keyframes onboardRing {
+  0%,100% { box-shadow: inset 0 0 20px rgba(110,240,255,0.1), 0 0 15px rgba(110,240,255,0.2); }
+  50% { box-shadow: inset 0 0 30px rgba(110,240,255,0.3), 0 0 25px rgba(110,240,255,0.5); }
+}
+.item.onboard-highlight {
+  animation: highlightItem 1s ease-in-out 3;
+}
+@keyframes highlightItem {
+  0%,100% { box-shadow: 0 0 10px rgba(110,240,255,0.15); }
+  50% { box-shadow: 0 0 20px rgba(110,240,255,0.5), inset 0 0 10px rgba(110,240,255,0.2); }
+}
+
+.splash {
+  position: fixed; inset: 0; z-index: 300;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: var(--bg);
+  transition: opacity 0.4s ease;
+}
+.splash.fade-out { opacity: 0; pointer-events: none; }
 </style>
 
 </head>
@@ -834,6 +942,11 @@ display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;
 <div class="stars"></div>
 <div class="scan"></div>
 <div class="era-overlay"></div>
+
+<div class="splash" id="splash">
+  <div style="font-family:'Major Mono Display',monospace;font-size:18px;color:#6ef0ff;letter-spacing:0.3em;text-shadow:0 0 15px rgba(110,240,255,0.8)">VOID MINERS</div>
+  <div style="font-size:10px;color:#8a9fc0;margin-top:12px;letter-spacing:0.2em">// ESTABLISHING VOID LINK</div>
+</div>
 
 <div id="app">
   <header>
@@ -843,16 +956,20 @@ display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;
     </div>
     <div class="res-grid">
       <div class="row"><span class="label">ORE</span><span class="val v-ore" id="ore">0</span></div>
-      <div class="row"><span class="label">CRYS</span><span class="val v-crys" id="crys">0</span></div>
-      <div class="row"><span class="label">SCRP</span><span class="val v-scrap" id="scrap">0</span></div>
-      <div class="row"><span class="label">/SEC</span><span class="rate" id="ops">0</span></div>
-      <div class="row"><span class="label">SING</span><span class="val v-sing" id="sing">0</span></div>
-      <div class="row"><span class="label">DM</span><span class="val v-dm" id="dm">0</span></div>
+      <div class="row"><span class="label">/SEC</span><span class="rate" id="ops" style="font-size:12px;color:var(--cyan);text-shadow:0 0 6px rgba(110,240,255,0.5)">0</span></div>
+      <div class="row" id="row-crys"><span class="label">CRYS</span><span class="val v-crys" id="crys">0</span></div>
+      <div class="row" id="row-scrap"><span class="label">SCRP</span><span class="val v-scrap" id="scrap">0</span></div>
+      <div class="row" id="row-sing"><span class="label">SING</span><span class="val v-sing" id="sing">0</span></div>
+      <div class="row" id="row-dm"><span class="label">DM</span><span class="val v-dm" id="dm">0</span></div>
     </div>
   </header>
 
   <div class="core" id="core">
-    <div class="core-mode-toggle" id="mode-toggle">/ MINE</div>
+    <div class="onboard-hint" id="onboard-hint" style="display:none">
+      <div class="onboard-ring"></div>
+      <div class="onboard-text">TAP TO MINE</div>
+    </div>
+    <div class="core-mode-toggle" id="mode-toggle">MINING</div>
     <div class="core-tap-power" id="tap-power">+1 / TAP</div>
     <div class="core-label">// EXTRACTION CORE</div>
     <div class="core-inner"></div>
@@ -910,7 +1027,7 @@ function fmtTime(s) {
 
 // ----- DATA -----
 const MINERS = [
-  { id: 'drone',   name: 'Scout Drone',     base: 15,        rate: 1.0,   growth: 1.12, desc: 'Tiny autonomous miner' },
+  { id: 'drone',   name: 'Scout Drone',     base: 15,        rate: 1.5,   growth: 1.12, desc: 'Tiny autonomous miner' },
   { id: 'rig',     name: 'Drill Rig',       base: 100,       rate: 8,     growth: 1.13, desc: 'Mounted excavation' },
   { id: 'hauler',  name: 'Ore Hauler',      base: 1100,      rate: 70,    growth: 1.14, desc: 'Hull-mounted scoops' },
   { id: 'reactor', name: 'Plasma Reactor',  base: 12000,     rate: 500,   growth: 1.15, desc: 'Vaporizes asteroid cores' },
@@ -921,7 +1038,7 @@ const WEAPONS = [
   { id: 'laser',   name: 'Pulse Laser',       base: 30,      dps: 2,      growth: 1.14, unlock: 'always',  desc: 'Cheap rapid-fire beam' },
   { id: 'rail',    name: 'Rail Cannon',       base: 400,     dps: 25,     growth: 1.15, unlock: 'kills:5', desc: 'Heavy kinetic slug' },
   { id: 'plasma',  name: 'Plasma Lance',      base: 6000,    dps: 220,    growth: 1.16, unlock: 'boss:1',  desc: 'Unlocked: Sector Warden' },
-  { id: 'missile', name: 'Swarm Missile',     base: 90000,   dps: 1800,   growth: 1.17, unlock: 'kills:30',desc: 'Homing micro-warheads' },
+  { id: 'missile', name: 'Swarm Missile',     base: 90000,   dps: 1800,   growth: 1.17, unlock: 'kills:15',desc: 'Homing micro-warheads' },
   { id: 'beam',    name: 'Annihilation Beam', base: 1.4e6,   dps: 14000,  growth: 1.18, unlock: 'boss:2',  desc: 'Unlocked: Star Eater' },
   { id: 'void',    name: 'Voidlance',         base: 2.2e7,   dps: 110000, growth: 1.19, unlock: 'boss:3',  desc: 'Unlocked: Void Sovereign' }
 ];
@@ -947,11 +1064,11 @@ const STAGES = [
   }
 ];
 
-// REBALANCED DM costs — first ascend gives ~5 DM, Era 1 at 4 means you can buy it but spend 1 DM elsewhere
+// REBALANCED DM costs — first ascend gives ~5 DM, Era 1 at 2 leaves 3 DM for META
 const ERAS = [
-  { id: 1, name: 'Drone Network',  cost: 4,  desc: 'Auto-buy miners, send Expeditions' },
-  { id: 2, name: 'Combat AI',      cost: 8,  desc: 'Auto-fight, auto-refine, Research tree' },
-  { id: 3, name: 'Reality Engine', cost: 15, desc: 'Auto-warp, Anomalies, Singularity Forge' },
+  { id: 1, name: 'Drone Network',  cost: 2,  desc: 'Auto-buy miners, send Expeditions' },
+  { id: 2, name: 'Combat AI',      cost: 6,  desc: 'Auto-fight, auto-refine, Research tree' },
+  { id: 3, name: 'Reality Engine', cost: 14, desc: 'Auto-warp, Anomalies, Singularity Forge' },
   { id: 4, name: 'Transcendence',  cost: 30, desc: 'Auto-ascend, full automation' }
 ];
 
@@ -1033,6 +1150,65 @@ const FORGE_MODIFIERS = [
   { id: 'mfBoss',   name: 'Bounty Hunter',  tag: 'offensive', effect: 'Boss rewards ×5' }
 ];
 
+const ACHIEVEMENTS = [
+  { id: 'first_drone', name: 'First Steps', icon: '\u2699', desc: 'Buy first Scout Drone',
+    reward: { type: 'starting_ore', val: 1 }, check: () => state.miners.drone >= 1 },
+  { id: 'first_kill', name: 'Blood In Space', icon: '\u2620', desc: 'Kill first enemy',
+    reward: { type: 'dps', val: 0.01 }, check: () => state.kills >= 1 || state.bossesEverDefeated[1] > 0 },
+  { id: 'kills_10', name: 'Seasoned Fighter', icon: '\u2620', desc: 'Kill 10 enemies',
+    reward: { type: 'dps', val: 0.02 }, check: () => (state.lifetimeKills || 0) >= 10 },
+  { id: 'kills_100', name: 'War Machine', icon: '\u2620', desc: 'Kill 100 enemies',
+    reward: { type: 'dps', val: 0.05 }, check: () => (state.lifetimeKills || 0) >= 100 },
+  { id: 'first_refine', name: 'Alchemist', icon: '\u25C6', desc: 'First refine',
+    reward: { type: 'crys_gain', val: 0.05 }, check: () => state.refineCount >= 1 },
+  { id: 'first_warp', name: 'Star Jumper', icon: '\u2605', desc: 'First warp',
+    reward: { type: 'sing_gain', val: 0.05 }, check: () => state.warpCount >= 1 },
+  { id: 'first_ascend', name: 'Transcendent', icon: '\u2726', desc: 'First ascend',
+    reward: { type: 'dm_gain_flat', val: 1 }, check: () => state.ascendCount >= 1 },
+  { id: 'boss_1', name: 'Warden Slayer', icon: '\u26A0', desc: 'Beat Sector Warden',
+    reward: { type: 'ore_rate', val: 0.10 }, check: () => state.bossesEverDefeated[1] > 0 },
+  { id: 'boss_2', name: 'Star Devourer', icon: '\u26A0', desc: 'Beat Star Eater',
+    reward: { type: 'dps', val: 0.10 }, check: () => state.bossesEverDefeated[2] > 0 },
+  { id: 'boss_3', name: 'Void Conqueror', icon: '\u26A0', desc: 'Beat Void Sovereign',
+    reward: { type: 'all_prod', val: 0.10 }, check: () => state.bossesEverDefeated[3] > 0 },
+  { id: 'refine_10', name: 'Crystallizer', icon: '\u25C6', desc: 'Refine 10 times',
+    reward: { type: 'crys_gain', val: 0.10 }, check: () => state.refineCount >= 10 },
+  { id: 'warp_10', name: 'Warp Addict', icon: '\u2605', desc: 'Warp 10 times',
+    reward: { type: 'sing_gain', val: 0.10 }, check: () => state.warpCount >= 10 },
+  { id: 'ore_1m', name: 'Millionaire', icon: '\u25A3', desc: 'Reach 1M total ore',
+    reward: { type: 'ore_rate', val: 0.05 }, check: () => state.totalOre >= 1e6 },
+  { id: 'ore_1b', name: 'Billionaire', icon: '\u25A3', desc: 'Reach 1B total ore',
+    reward: { type: 'ore_rate', val: 0.10 }, check: () => state.totalOre >= 1e9 },
+  { id: 'crys_100', name: 'Crystal Hoarder', icon: '\u25C7', desc: 'Accumulate 100 crystals',
+    reward: { type: 'crys_gain', val: 0.05 }, check: () => state.totalCrys >= 100 },
+  { id: 'sing_10', name: 'Graviton', icon: '\u25CE', desc: 'Accumulate 10 singularities',
+    reward: { type: 'sing_gain', val: 0.05 }, check: () => state.totalSing >= 10 },
+  { id: 'dm_10', name: 'Dark Scholar', icon: '\u2727', desc: 'Accumulate 10 DM',
+    reward: { type: 'dm_gain', val: 0.05 }, check: () => state.dm >= 10 },
+  { id: 'era_1', name: 'Drone Network', icon: '\u25B6', desc: 'Unlock Era 1',
+    reward: { type: 'all_prod', val: 0.05 }, check: () => state.erasUnlocked >= 1 },
+  { id: 'era_2', name: 'Combat AI', icon: '\u25B6', desc: 'Unlock Era 2',
+    reward: { type: 'all_prod', val: 0.05 }, check: () => state.erasUnlocked >= 2 },
+  { id: 'era_3', name: 'Reality Engine', icon: '\u25B6', desc: 'Unlock Era 3',
+    reward: { type: 'all_prod', val: 0.05 }, check: () => state.erasUnlocked >= 3 },
+  { id: 'era_4', name: 'Transcendence', icon: '\u25B6', desc: 'Unlock Era 4',
+    reward: { type: 'all_prod', val: 0.05 }, check: () => state.erasUnlocked >= 4 },
+  { id: 'sector_5', name: 'Deep Space', icon: '\u25C8', desc: 'Reach sector 5',
+    reward: { type: 'ore_rate', val: 0.05 }, check: () => state.sector >= 5 },
+  { id: 'sector_10', name: 'The Beyond', icon: '\u25C8', desc: 'Reach sector 10',
+    reward: { type: 'ore_rate', val: 0.10 }, check: () => state.sector >= 10 },
+  { id: 'expedition_5', name: 'Explorer', icon: '\u25BA', desc: 'Complete 5 expeditions',
+    reward: { type: 'exp_reward', val: 0.10 }, check: () => state.expeditionsHistory >= 5 },
+  { id: 'research_6', name: 'Scholar', icon: '\u25C9', desc: 'Complete 6 research nodes',
+    reward: { type: 'all_prod', val: 0.05 }, check: () => Object.keys(state.research).filter(k=>state.research[k]).length >= 6 },
+  { id: 'research_12', name: 'Omniscient', icon: '\u25C9', desc: 'Complete all 12 research',
+    reward: { type: 'all_prod', val: 0.15 }, check: () => Object.keys(state.research).filter(k=>state.research[k]).length >= 12 },
+  { id: 'speed_1k', name: 'Velocity', icon: '\u00BB', desc: 'Reach 1K ore/s',
+    reward: { type: 'ore_rate', val: 0.02 }, check: () => totalRate() >= 1000 },
+  { id: 'speed_1m', name: 'Hyperspeed', icon: '\u00BB', desc: 'Reach 1M ore/s',
+    reward: { type: 'ore_rate', val: 0.05 }, check: () => totalRate() >= 1e6 },
+];
+
 // ----- STATE -----
 function freshState() {
   return {
@@ -1049,7 +1225,7 @@ function freshState() {
     erasUnlocked: 0,
     autos: {
       buyMiners: false,
-      buyMinersStrategy: 'cheap',
+      buyMinersStrategy: 'efficient',
       buyWeapons: false,
       buyWeaponsStrategy: 'efficient',
       refine: false,
@@ -1067,6 +1243,7 @@ function freshState() {
     inAnomalyFight: false,    // we're fighting an anomaly boss
     anomalyFightData: null,   // { typeId, bossName, originalHp }
     kills: 0,
+    lifetimeKills: 0,
     bossesDefeated: { 1: false, 2: false, 3: false },
     bossesEverDefeated: { 1: 0, 2: 0, 3: 0 },
     expeditions: {},
@@ -1074,9 +1251,12 @@ function freshState() {
     activeBuffs: [],
     pendingAnomaly: null,
     anomalyAcc: 0,
+    achievements: {},
+    onboardingStep: 0,
   };
 }
 let state = freshState();
+let buyAmount = 1;
 
 const STORAGE_KEY = 'voidminers:save:v4';
 async function save() {
@@ -1102,6 +1282,7 @@ async function load() {
     if (!state.forgeModifiers) state.forgeModifiers = [];
     if (!state.expeditions) state.expeditions = {};
     if (!state.activeBuffs) state.activeBuffs = [];
+    if (!state.achievements) state.achievements = {};
     if (!state.autos) state.autos = fresh.autos;
     return true;
   } catch (e) { console.warn('Load failed:', e); return false; }
@@ -1156,6 +1337,28 @@ function bonusFromResearch(type) {
 }
 function hasResearch(type) { return bonusFromResearch(type) > 0; }
 
+function achievementBonus(type) {
+  let val = 0;
+  for (const a of ACHIEVEMENTS) {
+    if (state.achievements[a.id] && a.reward.type === type) val += a.reward.val;
+  }
+  return val;
+}
+function bulkCost(costFn, item, owned, count) {
+  let total = 0;
+  for (let i = 0; i < count; i++) total += costFn(item, owned + i);
+  return total;
+}
+function maxAffordable(costFn, item, owned, budget) {
+  let count = 0, spent = 0;
+  while (count < 9999) {
+    const c = costFn(item, owned + count);
+    if (spent + c > budget) break;
+    spent += c; count++;
+  }
+  return count;
+}
+
 function totalRate() {
   let r = 0;
   for (const m of MINERS) r += m.rate * state.miners[m.id];
@@ -1167,6 +1370,8 @@ function totalRate() {
   if (hasModifier('mfFast')) mult *= 2;
   if (hasModifier('mfSwarm')) mult *= 0.7;
   for (const b of state.activeBuffs) if (b.type === 'oreMult') mult *= b.val;
+  mult *= (1 + achievementBonus('ore_rate'));
+  mult *= (1 + achievementBonus('all_prod'));
   const awayCount = Object.values(state.expeditions).filter(e => e.active).reduce((s, e) => s + (e.minerCost || 0), 0);
   if (awayCount > 0) {
     const awayRatio = Math.min(1, awayCount / 100);
@@ -1187,10 +1392,12 @@ function totalDPS() {
   const enc = getCurrentEncounter();
   if (enc?.isBoss) mult *= (1 + bonusFromResearch('bossDmg'));
   for (const b of state.activeBuffs) if (b.type === 'dpsMult') mult *= b.val;
+  mult *= (1 + achievementBonus('dps'));
+  mult *= (1 + achievementBonus('all_prod'));
   return d * mult;
 }
 function globalMult() {
-  const crysBoost = 0.02 + 0.005 * (state.meta.crys || 0);
+  const crysBoost = 0.04 + 0.005 * (state.meta.crys || 0);
   const mFromCrys = 1 + state.crys * crysBoost;
   const mFromSing = Math.pow(1.5, Math.min(state.sing, 50));
   const mFromSpeed = Math.pow(1.25, state.meta.speed || 0);
@@ -1215,7 +1422,7 @@ function expDuration(e) {
   return Math.max(30, d);
 }
 function expYield(e) {
-  const yieldMult = 1 + 0.2 * (state.meta.expyld || 0);
+  const yieldMult = (1 + 0.2 * (state.meta.expyld || 0)) * (1 + achievementBonus('exp_reward'));
   const richMult = hasModifier('mfRich') ? 3 : 1;
   return {
     crys: Math.floor((e.yield.crys || 0) * yieldMult * richMult),
@@ -1244,13 +1451,14 @@ function getCurrentEncounter() {
   }
   const stage = STAGES.find(s => s.id === state.currentStage);
   if (!stage) return null;
+  const sectorScale = Math.pow(1.8, state.sector - 1);
   if (state.currentEnemyIdx >= stage.enemies.length) {
-    let bossHp = stage.boss.hp;
+    let bossHp = Math.ceil(stage.boss.hp * sectorScale);
     if (hasModifier('mfFast')) bossHp *= 3;
     return { ...stage.boss, hp: bossHp, isBoss: true, stageId: stage.id };
   }
   const e = stage.enemies[state.currentEnemyIdx];
-  return { ...e, isBoss: false, stageId: stage.id };
+  return { ...e, hp: Math.ceil(e.hp * sectorScale), isBoss: false, stageId: stage.id };
 }
 
 function spawnNextEnemy() {
@@ -1314,13 +1522,23 @@ function onEnemyDeath() {
   if (!enc) return;
   let bossBonus = 1 + 0.25 * (state.meta.bossres || 0);
   if (hasModifier('mfBoss')) bossBonus *= 5;
-  const reward = Math.floor(enc.reward * (enc.isBoss ? bossBonus : 1));
+  const sectorScale = Math.pow(1.8, state.sector - 1);
+  const reward = Math.floor(enc.reward * sectorScale * (enc.isBoss ? bossBonus : 1));
   state.scrap += reward; state.totalScrap += reward;
   const oreReward = reward * 10;
   state.ore += oreReward; state.totalOre += oreReward;
   state.kills++;
+  state.lifetimeKills = (state.lifetimeKills || 0) + 1;
+
+  // Death flash + particles
+  const flash = document.createElement('div');
+  flash.style.cssText = 'position:fixed;inset:0;background:rgba(255,159,90,0.12);z-index:99;pointer-events:none';
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 100);
+  spawnPrestigeParticles(enc.isBoss ? '#ffd76a' : '#ff9f5a', enc.isBoss ? 25 : 8);
 
   if (enc.isBoss) {
+    navigator.vibrate?.([50,30,50,30,50]);
     state.bossesDefeated[enc.stageId] = true;
     state.bossesEverDefeated[enc.stageId] = (state.bossesEverDefeated[enc.stageId] || 0) + 1;
     showBossVictory(enc, reward, oreReward);
@@ -1374,21 +1592,21 @@ function refineGain() {
   if (state.totalOre < refineThreshold()) return 0;
   let g = Math.floor(Math.sqrt(state.totalOre / refineThreshold()));
   if (hasModifier('mfRich')) g = Math.floor(g * 3);
-  return g;
+  return Math.floor(g * (1 + achievementBonus('crys_gain')));
 }
 function warpGain() {
   if (!state.bossesDefeated[2]) return 0;
   if (state.totalCrys < 25) return 0;
   let g = Math.floor(Math.pow(state.totalCrys / 25, 0.6) * (1 + 0.1 * (state.meta.sing || 0)));
   if (hasModifier('mfWarp')) g = Math.floor(g * 2);
-  return Math.max(g, 1);
+  return Math.max(Math.floor(g * (1 + achievementBonus('sing_gain'))), 1);
 }
 function ascendGain() {
   if (!state.bossesDefeated[3]) return 0;
   if (state.totalSing < 4) return 0;
-  // First ascend at 4 sing → 5 DM (enough to unlock Era 1 at cost 4, with 1 left over)
+  // First ascend at 4 sing → 5 DM (enough to unlock Era 1 at cost 2, with 3 left for META)
   // 8 sing → ~9 DM, 16 sing → ~16 DM, scales smoothly
-  return Math.max(1, Math.floor(state.totalSing * 1.25));
+  return Math.max(1, Math.floor(state.totalSing * 1.25 * (1 + achievementBonus('dm_gain')))) + Math.floor(achievementBonus('dm_gain_flat'));
 }
 
 // ----- inverse helpers: what total resource gives the NEXT integer of gain? -----
@@ -1430,6 +1648,8 @@ function nextAscendThreshold() {
 
 function doRefine() {
   const g = refineGain(); if (g <= 0) return;
+  navigator.vibrate?.([40,20,40]);
+  spawnPrestigeParticles('#ff5ac8', 20);
   state.crys += g; state.totalCrys += g; state.refineCount++;
   state.ore = startingOre(); state.totalOre = 0;
   for (const m of MINERS) state.miners[m.id] = 0;
@@ -1443,6 +1663,8 @@ function doRefine() {
 }
 function doWarp() {
   const g = warpGain(); if (g <= 0) return;
+  navigator.vibrate?.([40,20,40]);
+  spawnPrestigeParticles('#ffd76a', 30);
   state.sing += g; state.totalSing += g; state.warpCount++; state.sector++;
   state.ore = startingOre(); state.totalOre = 0;
   state.crys = 0; state.totalCrys = 0;
@@ -1461,6 +1683,8 @@ function doAscend() {
   else finalizeAscend(g, []);
 }
 function finalizeAscend(g, modifiers) {
+  navigator.vibrate?.([40,20,40]);
+  spawnPrestigeParticles('#b48aff', 40);
   const keep = {
     dm: state.dm + g,
     meta: state.meta,
@@ -1469,8 +1693,10 @@ function finalizeAscend(g, modifiers) {
     forgeModifiers: modifiers || [],
     ascendCount: state.ascendCount + 1,
     bossesEverDefeated: state.bossesEverDefeated,
+    lifetimeKills: state.lifetimeKills,
     expeditionsHistory: state.expeditionsHistory,
-    autos: state.autos
+    autos: state.autos,
+    achievements: state.achievements
   };
   state = Object.assign(freshState(), keep);
   state.ore = startingOre();
@@ -1518,29 +1744,40 @@ function showForgeModal(ascendGainAmount) {
   });
 }
 
-function startingOre() { return 25 * (state.meta.start || 0); }
+function startingOre() { return 25 * (state.meta.start || 0) + achievementBonus('starting_ore'); }
 
 // ===== BUYING =====
 function buyMiner(id) {
   const m = MINERS.find(x => x.id === id);
-  const cost = minerCost(m, state.miners[id]);
-  if (state.ore < cost) return false;
-  state.ore -= cost; state.miners[id]++;
-  return true;
+  const count = buyAmount === 'max' ? maxAffordable(minerCost, m, state.miners[id], state.ore) : buyAmount;
+  let bought = 0;
+  for (let i = 0; i < count; i++) {
+    const cost = minerCost(m, state.miners[id]);
+    if (state.ore < cost) break;
+    state.ore -= cost; state.miners[id]++; bought++;
+  }
+  if (bought > 0) navigator.vibrate?.(20);
+  return bought > 0;
 }
 function buyWeapon(id) {
   const w = WEAPONS.find(x => x.id === id);
   if (!weaponUnlocked(w)) return false;
-  const cost = weaponCost(w, state.weapons[id]);
-  if (state.ore < cost) return false;
-  state.ore -= cost; state.weapons[id]++;
-  return true;
+  const count = buyAmount === 'max' ? maxAffordable(weaponCost, w, state.weapons[id], state.ore) : buyAmount;
+  let bought = 0;
+  for (let i = 0; i < count; i++) {
+    const cost = weaponCost(w, state.weapons[id]);
+    if (state.ore < cost) break;
+    state.ore -= cost; state.weapons[id]++; bought++;
+  }
+  if (bought > 0) navigator.vibrate?.(20);
+  return bought > 0;
 }
 
 // ===== AUTO-BUY =====
 function autoBuyTick(dt) {
   state.autoBuyAcc += dt;
-  const speed = 1 / (1 + bonusFromResearch('autoSpeed'));
+  const autoMult = hasModifier('mfAuto') ? 0.667 : 1;
+  const speed = autoMult / (1 + bonusFromResearch('autoSpeed'));
   while (state.autoBuyAcc >= speed) {
     state.autoBuyAcc -= speed;
     let bought = false;
@@ -1875,6 +2112,7 @@ function tick() {
   checkExpeditionsTick();
   anomalyTick(dt);
   renderResources(); renderCombat();
+  checkOnboarding();
 }
 
 function applyOffline() {
@@ -1912,6 +2150,50 @@ function toast(msg, kind) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { el.className = ''; }, 2500);
 }
+function spawnPrestigeParticles(color, count) {
+  const core = document.getElementById('core');
+  const rect = core.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'prestige-particle';
+    const angle = (Math.PI * 2 * i / count) + (Math.random() - 0.5) * 0.5;
+    const dist = 60 + Math.random() * 120;
+    el.style.left = cx + 'px';
+    el.style.top = cy + 'px';
+    el.style.background = color;
+    el.style.boxShadow = '0 0 8px ' + color;
+    el.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    el.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+    el.style.animationDelay = (Math.random() * 0.15) + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1000);
+  }
+}
+function checkAchievements() {
+  for (const a of ACHIEVEMENTS) {
+    if (state.achievements[a.id]) continue;
+    try { if (a.check()) { state.achievements[a.id] = true; toast('\u2605 ' + a.name.toUpperCase(), 'green'); } } catch(e) {}
+  }
+}
+function checkOnboarding() {
+  if (state.onboardingStep >= 2) return;
+  const hint = document.getElementById('onboard-hint');
+  if (!hint) return;
+  if (state.onboardingStep === 0) {
+    if (state.totalOre === 0 && state.miners.drone === 0) {
+      hint.style.display = 'flex';
+    } else {
+      hint.style.display = 'none';
+      state.onboardingStep = 1;
+    }
+  }
+  if (state.onboardingStep === 1 && state.miners.drone > 0) {
+    state.onboardingStep = 2;
+    toast('DRONES MINE AUTOMATICALLY — ORE/S SHOWS YOUR RATE', 'green');
+  }
+}
 function spawnFloat(x, y, text, kind) {
   const el = document.createElement('div');
   el.className = 'float' + (kind ? ' ' + kind : '');
@@ -1931,6 +2213,14 @@ function renderResources() {
   document.getElementById('tier-text').textContent = '// SECTOR ' + String(state.sector).padStart(2, '0') + ' // ERA ' + state.erasUnlocked;
   if (state.mode === 'mine') document.getElementById('tap-power').textContent = '+' + fmt(tapPower()) + ' / TAP';
   else document.getElementById('tap-power').textContent = fmt(tapDamage()) + ' DMG / TAP';
+  const rc = document.getElementById('row-crys');
+  const rs = document.getElementById('row-scrap');
+  const ri = document.getElementById('row-sing');
+  const rd = document.getElementById('row-dm');
+  if (rc) rc.style.display = (state.totalCrys > 0 || state.refineCount > 0 || state.crys > 0) ? 'flex' : 'none';
+  if (rs) rs.style.display = (state.totalScrap > 0 || state.kills > 0 || state.scrap > 0) ? 'flex' : 'none';
+  if (ri) ri.style.display = (state.totalSing > 0 || state.warpCount > 0 || state.sing > 0) ? 'flex' : 'none';
+  if (rd) rd.style.display = (state.dm > 0 || state.ascendCount > 0) ? 'flex' : 'none';
 }
 
 function renderCombat() {
@@ -1974,10 +2264,11 @@ function renderTabs() {
     { id: 'mine',     label: 'MINE',  cls: '' },
     { id: 'combat',   label: 'FIGHT', cls: 'combat' },
     { id: 'expedition', label: 'EXPED', cls: 'expedition', minEra: 1 },
-    { id: 'research', label: 'RSCH', cls: 'research', minEra: 2 },
-    { id: 'anomaly',  label: 'ANOM', cls: 'anomaly', minEra: 3 },
-    { id: 'upgrade',  label: 'STAT', cls: '' },
-    { id: 'prestige', label: 'RESET',cls: '' },
+    { id: 'research', label: 'TECH', cls: 'research', minEra: 2 },
+    { id: 'anomaly',  label: 'EVENT', cls: 'anomaly', minEra: 3 },
+    { id: 'upgrade',  label: 'BOOSTS', cls: '' },
+    { id: 'achv',     label: 'ACHV', cls: '' },
+    { id: 'prestige', label: 'REBIRTH',cls: '' },
     { id: 'meta',     label: 'META', cls: '' }
   ];
   let html = '';
@@ -1986,7 +2277,16 @@ function renderTabs() {
                    (t.id === 'combat' && state.totalOre < 30 && state.kills === 0 && state.weapons.laser === 0) ||
                    (t.id === 'meta' && state.dm <= 0 && state.ascendCount === 0);
     let badge = '';
-    if (t.id === 'prestige' && (refineGain() > 0 || warpGain() > 0 || ascendGain() > 0)) badge = ' <span class="badge">!</span>';
+    if (t.id === 'prestige') {
+      const ag = ascendGain(), wg = warpGain(), rg = refineGain();
+      if (ag > 0) badge = ' <span class="badge violet">+' + fmt(ag) + ' DM</span>';
+      else if (wg > 0) badge = ' <span class="badge gold">+' + fmt(wg) + ' SING</span>';
+      else if (rg > 0) badge = ' <span class="badge">+' + fmt(rg) + ' CRYS</span>';
+    }
+    if (t.id === 'achv') {
+      const count = Object.keys(state.achievements).length;
+      if (count > 0) badge = ' <span class="badge green">' + count + '/' + ACHIEVEMENTS.length + '</span>';
+    }
     if (t.id === 'anomaly' && state.pendingAnomaly) badge = ' <span class="badge violet">★</span>';
     if (t.id === 'expedition' && Object.values(state.expeditions).some(e => e.active)) badge = ' <span class="badge green">●</span>';
     html += `<button class="tab ${t.cls} ${state.tab === t.id ? 'active' : ''} ${locked ? 'locked' : ''}" data-tab="${t.id}">${t.label}${badge}</button>`;
@@ -1994,16 +2294,27 @@ function renderTabs() {
   document.getElementById('tabs').innerHTML = html;
   document.querySelectorAll('#tabs .tab').forEach(el => {
     el.addEventListener('click', () => {
-      if (el.classList.contains('locked')) return;
+      if (el.classList.contains('locked')) {
+        const id = el.dataset.tab;
+        const reasons = {
+          combat: 'EARN 30 ORE OR BUY A WEAPON FIRST',
+          expedition: 'UNLOCK ERA 1 TO ACCESS EXPEDITIONS',
+          research: 'UNLOCK ERA 2 TO ACCESS RESEARCH',
+          anomaly: 'UNLOCK ERA 3 TO ACCESS ANOMALIES',
+          meta: 'ASCEND FIRST TO UNLOCK META'
+        };
+        toast(reasons[id] || 'LOCKED', 'bad');
+        return;
+      }
       state.tab = el.dataset.tab;
       if (state.tab === 'combat') {
         state.mode = 'combat';
         const btn = document.getElementById('mode-toggle');
-        btn.textContent = '/ FIGHT'; btn.classList.add('combat');
+        btn.textContent = 'COMBAT'; btn.classList.add('combat');
       } else if (state.tab === 'mine') {
         state.mode = 'mine';
         const btn = document.getElementById('mode-toggle');
-        btn.textContent = '/ MINE'; btn.classList.remove('combat');
+        btn.textContent = 'MINING'; btn.classList.remove('combat');
       }
       render();
     });
@@ -2019,17 +2330,27 @@ function renderPanel() {
     case 'research': panel.innerHTML = renderResearch(); attachResearch(); break;
     case 'anomaly': panel.innerHTML = renderAnomaly(); attachAnom(); break;
     case 'upgrade': panel.innerHTML = renderStats(); break;
+    case 'achv': panel.innerHTML = renderAchievements(); break;
     case 'prestige': panel.innerHTML = renderPrestige(); attachPrestige(); break;
     case 'meta': panel.innerHTML = renderMeta(); attachMeta(); break;
   }
 }
+function attachBulk() {
+  document.querySelectorAll('#panel .bulk-btn').forEach(el => el.addEventListener('click', () => {
+    const v = el.dataset.bulk;
+    buyAmount = v === 'max' ? 'max' : parseInt(v);
+    render();
+  }));
+}
 function attachBuy() {
-  document.querySelectorAll('#panel [data-buy]').forEach(el => el.addEventListener('click', () => { buyMiner(el.dataset.buy); render(); save(); }));
+  attachBulk();
+  document.querySelectorAll('#panel [data-buy]').forEach(el => el.addEventListener('click', () => { if (buyMiner(el.dataset.buy)) el.classList.add('just-bought'); render(); save(); }));
   document.querySelectorAll('#panel [data-strat-m]').forEach(el => el.addEventListener('click', () => { state.autos.buyMinersStrategy = el.dataset.stratM; render(); save(); }));
   document.querySelectorAll('#panel [data-toggle-buy-miners]').forEach(el => el.addEventListener('click', () => { state.autos.buyMiners = !state.autos.buyMiners; render(); save(); }));
 }
 function attachWeapon() {
-  document.querySelectorAll('#panel [data-wpn]').forEach(el => el.addEventListener('click', () => { buyWeapon(el.dataset.wpn); render(); save(); }));
+  attachBulk();
+  document.querySelectorAll('#panel [data-wpn]').forEach(el => el.addEventListener('click', () => { if (buyWeapon(el.dataset.wpn)) el.classList.add('just-bought'); render(); save(); }));
   document.querySelectorAll('#panel [data-strat-w]').forEach(el => el.addEventListener('click', () => { state.autos.buyWeaponsStrategy = el.dataset.stratW; render(); save(); }));
   document.querySelectorAll('#panel [data-toggle-buy-weapons]').forEach(el => el.addEventListener('click', () => { state.autos.buyWeapons = !state.autos.buyWeapons; render(); save(); }));
 }
@@ -2040,10 +2361,39 @@ function attachAnom() {
   document.querySelectorAll('#panel [data-anom-resolve]').forEach(el => el.addEventListener('click', () => resolveAnomaly(0)));
   document.querySelectorAll('#panel [data-anom-fight]').forEach(el => el.addEventListener('click', () => startAnomalyFight()));
 }
+function showPrestigeConfirm(title, gainHtml, loseText, colorClass, action) {
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal ${colorClass === 'warp' ? 'boss' : colorClass === 'ascend' ? 'era' : ''}">
+      <h2>// CONFIRM ${title}</h2>
+      <div class="reward">${gainHtml}</div>
+      <p style="color:var(--bad);font-size:10px;letter-spacing:0.1em;margin-top:8px">${loseText}</p>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="btn" id="confirm-cancel" style="flex:1">CANCEL</button>
+        <button class="btn go ${colorClass}" id="confirm-ok" style="flex:1">${title}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(bg);
+  document.getElementById('confirm-cancel').addEventListener('click', () => bg.remove());
+  document.getElementById('confirm-ok').addEventListener('click', () => { bg.remove(); action(); });
+}
 function attachPrestige() {
-  const r = document.getElementById('do-refine'); if (r) r.onclick = doRefine;
-  const w = document.getElementById('do-warp'); if (w) w.onclick = doWarp;
-  const a = document.getElementById('do-ascend'); if (a) a.onclick = doAscend;
+  const r = document.getElementById('do-refine');
+  if (r) r.onclick = () => {
+    const g = refineGain(); if (g <= 0) return;
+    showPrestigeConfirm('REFINE', `+${fmt(g)} CRYSTALS`, 'Resets Ore, Miners, Weapons, Combat progress', 'refine', doRefine);
+  };
+  const w = document.getElementById('do-warp');
+  if (w) w.onclick = () => {
+    const g = warpGain(); if (g <= 0) return;
+    showPrestigeConfirm('WARP', `+${fmt(g)} SINGULARITIES`, 'Resets Ore, Crystals, Miners, Weapons, Combat', 'warp', doWarp);
+  };
+  const a = document.getElementById('do-ascend');
+  if (a) a.onclick = () => {
+    const g = ascendGain(); if (g <= 0) return;
+    showPrestigeConfirm('ASCEND', `+${fmt(g)} DARK MATTER`, 'Resets EVERYTHING except DM, Eras, META, Research', 'ascend', doAscend);
+  };
   document.querySelectorAll('#panel [data-toggle-auto]').forEach(el => el.addEventListener('click', () => {
     state.autos[el.dataset.toggleAuto] = !state.autos[el.dataset.toggleAuto];
     render(); save();
@@ -2054,8 +2404,18 @@ function attachMeta() {
   const eraBtn = document.getElementById('buy-era'); if (eraBtn) eraBtn.onclick = buyEra;
 }
 
+function renderBulkToggle() {
+  return `<div style="display:flex;gap:4px;margin-bottom:8px;justify-content:flex-end">
+    <span style="font-size:9px;color:var(--ink-dim);align-self:center;margin-right:4px">BUY:</span>
+    ${[1,10,25,'max'].map(n => {
+      const active = buyAmount === n;
+      return `<button class="btn small bulk-btn" data-bulk="${n}" style="${active?'background:var(--cyan);color:var(--bg);border-color:var(--cyan)':''}">x${n==='max'?'MAX':n}</button>`;
+    }).join('')}
+  </div>`;
+}
 function renderMine() {
   let html = `<div class="section-title">EXTRACTION FLEET<span class="sub">${fmt(totalRate())}/s</span></div>`;
+  html += renderBulkToggle();
   if (era() >= 1) {
     const on = state.autos.buyMiners;
     html += `<div class="auto-toggle-row">
@@ -2069,24 +2429,28 @@ function renderMine() {
         <span class="strategy-chip ${state.autos.buyMinersStrategy==='efficient'?'active':''}" data-strat-m="efficient">BEST RATE/COST</span>
         <span class="strategy-chip ${state.autos.buyMinersStrategy==='highest'?'active':''}" data-strat-m="highest">HIGHEST TIER</span>
       </div>
+      <div style="font-size:9px;color:var(--ink-dim);margin-top:2px;padding-left:4px">// ${({'cheap':'Buys the cheapest available item','efficient':'Buys the item with best value per ore','highest':'Saves for the highest-tier item'})[state.autos.buyMinersStrategy]}</div>
     </div>`;
   }
   let unlocked = 0;
   for (let i = 0; i < MINERS.length; i++) {
-    const m = MINERS[i]; const owned = state.miners[m.id]; const cost = minerCost(m, owned);
+    const m = MINERS[i]; const owned = state.miners[m.id];
     const prevOwned = i === 0 ? 1 : state.miners[MINERS[i-1].id];
     const visible = i === 0 || prevOwned > 0 || state.totalOre >= m.base / 2;
     if (!visible) continue;
     unlocked = i;
-    const can = state.ore >= cost;
+    const bCount = buyAmount === 'max' ? maxAffordable(minerCost, m, owned, state.ore) : buyAmount;
+    const bCost = bulkCost(minerCost, m, owned, bCount);
+    const can = bCount > 0 && state.ore >= bCost;
     const out = m.rate * owned * globalMult() * (1 + bonusFromResearch('mineRate'));
-    html += `<div class="item ${can?'affordable':'cant'}" data-buy="${m.id}">
+    const label = buyAmount === 'max' ? (bCount > 0 ? 'x' + bCount : 'MAX') : (buyAmount > 1 ? 'x' + buyAmount : 'COST');
+    html += `<div class="item ${can?'affordable':'cant'}${state.onboardingStep === 1 && m.id === 'drone' ? ' onboard-highlight' : ''}" data-buy="${m.id}">
       <div>
         <div class="name">${m.name}</div>
         <div class="desc">${m.desc} · ${fmt(m.rate * globalMult() * (1 + bonusFromResearch('mineRate')))}/s each</div>
         <div class="qty">OWNED ${owned} · ${fmt(out)}/s</div>
       </div>
-      <div class="buy"><div class="label">COST</div><div class="cost">${fmt(cost)}</div></div>
+      <div class="buy"><div class="label">${label}</div><div class="cost">${fmt(bCost)}</div></div>
     </div>`;
   }
   if (unlocked < MINERS.length - 1) {
@@ -2098,6 +2462,7 @@ function renderMine() {
 
 function renderCombatPanel() {
   let html = `<div class="section-title combat">WEAPON LOADOUT<span class="sub">${fmt(totalDPS())} DPS</span></div>`;
+  html += renderBulkToggle();
   if (era() >= 2) {
     const on = state.autos.buyWeapons;
     html += `<div class="auto-toggle-row">
@@ -2111,6 +2476,7 @@ function renderCombatPanel() {
         <span class="strategy-chip ${state.autos.buyWeaponsStrategy==='efficient'?'active':''}" data-strat-w="efficient">BEST DPS/COST</span>
         <span class="strategy-chip ${state.autos.buyWeaponsStrategy==='highest'?'active':''}" data-strat-w="highest">HIGHEST TIER</span>
       </div>
+      <div style="font-size:9px;color:var(--ink-dim);margin-top:2px;padding-left:4px">// ${({'cheap':'Buys the cheapest available item','efficient':'Buys the item with best value per ore','highest':'Saves for the highest-tier item'})[state.autos.buyWeaponsStrategy]}</div>
     </div>`;
   }
   const enc = getCurrentEncounter();
@@ -2120,7 +2486,7 @@ function renderCombatPanel() {
     if (enc.isAnomaly) label = '<span style="color:var(--violet)">⚡ ANOMALY: ' + enc.name + '</span>';
     else if (enc.isBoss) label = '<span style="color:var(--gold)">⚠ ' + enc.name + '</span>';
     else label = '<span style="color:var(--crimson)">' + enc.name + '</span>';
-    const oreReward = Math.floor(enc.reward * 10 * (enc.isBoss ? 1 + 0.25*(state.meta.bossres||0) : 1));
+    const sectorScale = Math.pow(1.8, state.sector - 1); const oreReward = Math.floor(enc.reward * sectorScale * 10 * (enc.isBoss ? 1 + 0.25*(state.meta.bossres||0) : 1));
     html += `<div style="font-size:10px;color:var(--ink-dim);margin-bottom:8px;line-height:1.6">
       Target: ${label} ·
       ${enc.isAnomaly ? 'Reward: <span style="color:var(--violet)">ANOMALY BUFF</span>' : 'Reward: <span style="color:var(--orange)">+' + fmt(oreReward) + ' ORE</span>'} ·
@@ -2140,17 +2506,19 @@ function renderCombatPanel() {
     }
     if (!unlocked) continue;
     hasShown = true;
-    const cost = weaponCost(w, owned);
-    const can = state.ore >= cost;
+    const bCount = buyAmount === 'max' ? maxAffordable(weaponCost, w, owned, state.ore) : buyAmount;
+    const bCost = bulkCost(weaponCost, w, owned, bCount);
+    const can = bCount > 0 && state.ore >= bCost;
     const wpnMult = (1 + 0.25*(state.meta.wpndmg||0)) * (1 + bonusFromResearch('wpnDmg')) * globalMult();
     const out = w.dps * owned * wpnMult;
+    const label = buyAmount === 'max' ? (bCount > 0 ? 'x' + bCount : 'MAX') : (buyAmount > 1 ? 'x' + buyAmount : 'ORE');
     html += `<div class="item weapon ${can?'affordable':'cant'}" data-wpn="${w.id}">
       <div>
         <div class="name">${w.name}</div>
         <div class="desc">${w.desc} · ${fmt(w.dps * wpnMult)} DPS each</div>
         <div class="qty">OWNED ${owned} · ${fmt(out)} DPS</div>
       </div>
-      <div class="buy"><div class="label">ORE</div><div class="cost">${fmt(cost)}</div></div>
+      <div class="buy"><div class="label">${label}</div><div class="cost">${fmt(bCost)}</div></div>
     </div>`;
   }
   html += `<div class="section-title combat" style="margin-top:14px">SECTOR PROGRESS<span class="sub">${state.kills} KILLS</span></div>`;
@@ -2305,8 +2673,8 @@ function renderStats() {
   html += `
     <div class="item"><div>
       <div class="name">Crystal Resonance</div>
-      <div class="desc">Each Crystal: +${(2+0.5*(state.meta.crys||0)).toFixed(1)}% Ore + DPS</div>
-      <div class="qty">${state.crys} crys · ×${(1 + state.crys * (0.02+0.005*(state.meta.crys||0))).toFixed(2)}</div>
+      <div class="desc">Each Crystal: +${(4+0.5*(state.meta.crys||0)).toFixed(1)}% Ore + DPS</div>
+      <div class="qty">${state.crys} crys · ×${(1 + state.crys * (0.04+0.005*(state.meta.crys||0))).toFixed(2)}</div>
     </div><div class="buy"><div class="label">PASSIVE</div><div class="cost" style="color:var(--magenta)">CRYS</div></div></div>
     <div class="item"><div>
       <div class="name">Singularity Field</div>
@@ -2373,13 +2741,32 @@ function renderNextTier(current, needed, nextGain, currentGain, color, unit) {
     </div>`;
 }
 
+function renderAchievements() {
+  const unlocked = Object.keys(state.achievements).length;
+  let html = `<div class="section-title" style="color:var(--green);border-color:rgba(125,255,176,0.4);text-shadow:0 0 8px rgba(125,255,176,0.4)">ACHIEVEMENTS<span class="sub">${unlocked}/${ACHIEVEMENTS.length}</span></div>`;
+  for (const a of ACHIEVEMENTS) {
+    const done = !!state.achievements[a.id];
+    const rewardLabel = a.reward.type === 'dm_gain_flat' ? '+' + a.reward.val + ' DM on ascend' : '+' + Math.round(a.reward.val * 100) + '% ' + a.reward.type.replace(/_/g, ' ');
+    html += `<div class="achv-card ${done?'unlocked':''}">
+      <div class="achv-icon">${done ? a.icon : '?'}</div>
+      <div>
+        <div class="achv-name">${done ? a.name : '???'}</div>
+        <div class="achv-desc">${a.desc}</div>
+        <div class="achv-reward">${rewardLabel}</div>
+      </div>
+      <div class="achv-status">${done ? '\u2713 DONE' : 'LOCKED'}</div>
+    </div>`;
+  }
+  return html;
+}
+
 function renderPrestige() {
   const refG = refineGain(); const warpG = warpGain(); const ascG = ascendGain();
   let html = '';
   const t1 = state.bossesDefeated[1];
   html += `<div class="prestige-box refine">
     <h3>// REFINE</h3>
-    <p>Smelt your ore into permanent Crystals. Resets Ore, Miners, Weapons, Combat. Each Crystal: +${(2+0.5*(state.meta.crys||0)).toFixed(1)}% production & DPS.</p>
+    <p>Smelt your ore into permanent Crystals. Resets Ore, Miners, Weapons, Combat. Each Crystal: +${(4+0.5*(state.meta.crys||0)).toFixed(1)}% production & DPS.</p>
     <div class="gate ${t1?'cleared':''}">${t1?'✓ GATE CLEARED':'✗ GATE: Defeat SECTOR WARDEN'}</div>`;
   if (era() >= 2) {
     const on = state.autos.refine;
@@ -2486,12 +2873,14 @@ function render() {
 document.getElementById('core').addEventListener('pointerdown', (e) => {
   const rect = e.currentTarget.getBoundingClientRect();
   if (state.mode === 'mine') {
+    navigator.vibrate?.(10);
     const tp = tapPower();
     if (tp > 0) {
       state.ore += tp; state.totalOre += tp;
       spawnFloat(e.clientX - rect.left, e.clientY - rect.top, '+' + fmt(tp));
     }
   } else {
+    navigator.vibrate?.(10);
     if (hasModifier('mfAuto')) return;
     const isCrit = Math.random() < critChance();
     const dmg = tapDamage() * (isCrit ? 3 : 1);
@@ -2506,17 +2895,31 @@ document.getElementById('mode-toggle').addEventListener('click', (e) => {
   e.stopPropagation();
   state.mode = state.mode === 'mine' ? 'combat' : 'mine';
   const btn = document.getElementById('mode-toggle');
-  if (state.mode === 'combat') { btn.textContent = '/ FIGHT'; btn.classList.add('combat'); }
-  else { btn.textContent = '/ MINE'; btn.classList.remove('combat'); }
+  if (state.mode === 'combat') { btn.textContent = 'COMBAT'; btn.classList.add('combat'); }
+  else { btn.textContent = 'MINING'; btn.classList.remove('combat'); }
   render();
 });
 
-document.getElementById('reset-btn').addEventListener('click', async () => {
-  if (!confirm('Permanently delete ALL progress including Dark Matter, Eras, META, and Research?')) return;
-  await wipe();
-  state = freshState(); state.ore = startingOre(); spawnNextEnemy();
-  applyEraTheme();
-  render(); toast('// MEMORY WIPED', 'bad');
+document.getElementById('reset-btn').addEventListener('click', () => {
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal">
+      <h2>// WIPE ALL DATA</h2>
+      <p style="color:var(--bad)">Permanently delete ALL progress including Dark Matter, Eras, META, and Research?</p>
+      <p>This cannot be undone.</p>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="btn" id="reset-cancel" style="flex:1">CANCEL</button>
+        <button class="btn go combat" id="reset-confirm" style="flex:1">WIPE</button>
+      </div>
+    </div>`;
+  document.body.appendChild(bg);
+  document.getElementById('reset-cancel').addEventListener('click', () => bg.remove());
+  document.getElementById('reset-confirm').addEventListener('click', async () => {
+    bg.remove(); await wipe();
+    state = freshState(); state.ore = startingOre(); spawnNextEnemy();
+    applyEraTheme(); render(); toast('// MEMORY WIPED', 'bad');
+  });
 });
 
 document.getElementById('export-btn').addEventListener('click', () => {
@@ -2524,8 +2927,25 @@ document.getElementById('export-btn').addEventListener('click', () => {
 });
 
 document.getElementById('import-btn').addEventListener('click', () => {
-  const code = prompt('Paste your save code here:');
-  if (code && code.trim()) importSave(code);
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal">
+      <h2>// IMPORT SAVE</h2>
+      <p>Paste your save code below:</p>
+      <textarea id="import-input" style="width:100%;height:80px;background:var(--bg);color:var(--ink);border:1px solid rgba(120,220,255,0.35);font-family:inherit;font-size:10px;padding:8px;margin:8px 0;resize:none;box-sizing:border-box"></textarea>
+      <div style="display:flex;gap:8px">
+        <button class="btn" id="import-cancel" style="flex:1">CANCEL</button>
+        <button class="btn go refine" id="import-confirm" style="flex:1">IMPORT</button>
+      </div>
+    </div>`;
+  document.body.appendChild(bg);
+  document.getElementById('import-cancel').addEventListener('click', () => bg.remove());
+  document.getElementById('import-confirm').addEventListener('click', () => {
+    const code = document.getElementById('import-input').value;
+    bg.remove();
+    if (code && code.trim()) importSave(code);
+  });
 });
 
 document.getElementById('mute-btn').addEventListener('click', toggleMute);
@@ -2552,10 +2972,15 @@ try {
   state.lastTick = Date.now();
   applyEraTheme();
   render();
+  setTimeout(() => {
+    const splash = document.getElementById('splash');
+    if (splash) { splash.classList.add('fade-out'); setTimeout(() => splash.remove(), 400); }
+  }, 300);
   setInterval(tick, 100);
   setInterval(save, 5000);
   setInterval(() => {
-    if (['mine','prestige','combat','upgrade','expedition','research','anomaly','meta'].includes(state.tab)) renderPanel();
+    if (['mine','prestige','combat','upgrade','expedition','research','anomaly','meta','achv'].includes(state.tab)) renderPanel();
+    checkAchievements();
     renderTabs();
   }, 700);
   document.getElementById('status').textContent = '// LINK STABLE';
@@ -2563,6 +2988,10 @@ try {
 
 window.addEventListener('pagehide', save);
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
 </script>
 
 </body>
