@@ -2360,7 +2360,11 @@ function renderTabs() {
     if (t.id === 'expedition' && Object.values(state.expeditions).some(e => e.active)) badge = ' <span class="badge green">●</span>';
     html += `<button class="tab ${t.cls} ${state.tab === t.id ? 'active' : ''} ${locked ? 'locked' : ''}" data-tab="${t.id}">${t.label}${badge}</button>`;
   }
-  document.getElementById('tabs').innerHTML = html;
+  // Skip DOM rebuild if tabs haven't changed
+  const tabsEl = document.getElementById('tabs');
+  if (tabsEl._lastHtml === html) return;
+  tabsEl._lastHtml = html;
+  tabsEl.innerHTML = html;
   document.querySelectorAll('#tabs .tab').forEach(el => {
     el.addEventListener('click', () => {
       if (el.classList.contains('locked')) {
@@ -3069,10 +3073,25 @@ try {
   }, 300);
   setInterval(tick, 100);
   setInterval(save, 5000);
+  // Track last-rendered state snapshot to avoid redundant full DOM rebuilds
+  let _lastPanelHash = '';
   setInterval(() => {
-    if (['mine','prestige','combat','upgrade','expedition','research','anomaly','meta','achv'].includes(state.tab)) renderPanel();
     checkAchievements();
     renderTabs();
+    // Only rebuild panel innerHTML when displayed data actually changed
+    if (['mine','prestige','combat','upgrade','expedition','research','anomaly','meta','achv'].includes(state.tab)) {
+      const hash = JSON.stringify([
+        state.tab, state.ore, state.crys, state.sing, state.dm, state.scrap,
+        state.miners, state.weapons, state.kills, state.sector, state.enemyHp,
+        state.expeditions, state.research, state.anomaly, state.autos,
+        state.meta, state.refineCount, state.warpCount, state.ascendCount,
+        state.achievements, state.buffs, buyAmount,
+      ]);
+      if (hash !== _lastPanelHash) {
+        _lastPanelHash = hash;
+        renderPanel();
+      }
+    }
   }, 700);
   document.getElementById('status').textContent = currentUser
     ? '// ' + currentUser.email.toUpperCase()
