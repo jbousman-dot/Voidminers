@@ -2495,14 +2495,14 @@ function _updatePanelValues(tab) {
       if (labelEl) _setText(labelEl, label);
     });
   } else if (tab === 'combat') {
-    // Update weapon rows similarly
+    // Update weapon rows — weapons cost ORE, not scrap
     document.querySelectorAll('#panel [data-wpn]').forEach(el => {
       const w = WEAPONS.find(x => x.id === el.dataset.wpn);
       if (!w) return;
       const owned = state.weapons[w.id];
-      const bCount = buyAmount === 'max' ? maxAffordable(weaponCost, w, owned, state.scrap) : buyAmount;
+      const bCount = buyAmount === 'max' ? maxAffordable(weaponCost, w, owned, state.ore) : buyAmount;
       const bCost = bulkCost(weaponCost, w, owned, bCount);
-      const can = bCount > 0 && state.scrap >= bCost;
+      const can = bCount > 0 && state.ore >= bCost;
       const label = buyAmount === 'max' ? (bCount > 0 ? 'x' + bCount : 'MAX') : (buyAmount > 1 ? 'x' + buyAmount : 'COST');
       if (el.classList.contains('affordable') !== can) {
         el.classList.toggle('affordable', can);
