@@ -1,6 +1,6 @@
 // Network-first service worker: always fetch fresh, fall back to cache for offline.
 // Cache version is auto-incremented on each deploy via the build timestamp.
-const CACHE = 'voidminers-v3';
+const CACHE = 'voidminers-v4';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
