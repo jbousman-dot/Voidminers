@@ -1583,7 +1583,7 @@ function onEnemyDeath() {
     state.ore += bonus; state.totalOre += bonus;
     showAnomalyVictory(t, bonus);
     spawnNextEnemy(); // back to normal stage
-    render(); save();
+    render();
     return;
   }
 
@@ -1617,7 +1617,7 @@ function onEnemyDeath() {
     state.currentEnemyIdx++;
   }
   spawnNextEnemy();
-  render(); save();
+  render();
 }
 
 function showBossVictory(enc, scrapReward, oreReward) {
@@ -1728,7 +1728,7 @@ function doRefine() {
   state.bossesDefeated = { 1: false, 2: false, 3: false };
   spawnNextEnemy();
   toast(`+${fmt(g)} CRYSTALS`, 'gold');
-  render(); save();
+  render();
 }
 function doWarp() {
   const g = warpGain(); if (g <= 0) return;
@@ -1744,7 +1744,7 @@ function doWarp() {
   state.bossesDefeated = { 1: false, 2: false, 3: false };
   spawnNextEnemy();
   toast(`+${fmt(g)} SING — SECTOR ${String(state.sector).padStart(2,'0')}`, 'gold');
-  render(); save();
+  render();
 }
 function doAscend() {
   const g = ascendGain(); if (g <= 0) return;
@@ -1773,7 +1773,7 @@ function finalizeAscend(g, modifiers) {
   toast(`+${fmt(g)} DARK MATTER — REALITY REWRITTEN`, 'violet');
   state.tab = 'meta';
   applyEraTheme();
-  render(); save();
+  render();
 }
 
 function showForgeModal(ascendGainAmount) {
@@ -1899,7 +1899,7 @@ function startExpedition(id) {
     active: true, startTime: Date.now(), duration: expDuration(e) * 1000, minerCost: e.minerCost
   };
   toast(`Expedition launched: ${e.name}`, 'green');
-  render(); save();
+  render();
 }
 function checkExpeditionsTick() {
   const now = Date.now();
@@ -1920,7 +1920,7 @@ function checkExpeditionsTick() {
       else toast(`Expedition: +${fmt(y.crys)} CRYS, +${fmt(y.scrap)} SCRAP`, 'green');
       state.expeditions[id] = { active: false };
       state.expeditionsHistory++;
-      render(); save();
+      render();
     }
   }
 }
@@ -2074,7 +2074,7 @@ function startAnomalyFight() {
   // dramatic entrance
   playBossEntrance(t.bossName, 'anomaly');
   toast(`⚔ FIGHTING ${t.bossName}`, 'violet');
-  render(); save();
+  render();
 }
 function resolveAnomaly(choiceIdx) {
   if (!state.pendingAnomaly) return;
@@ -2100,7 +2100,7 @@ function resolveAnomaly(choiceIdx) {
     }
   }
   state.pendingAnomaly = null;
-  render(); save();
+  render();
 }
 function buffsTick() {
   const now = Date.now();
@@ -2118,7 +2118,7 @@ function buyEra() {
   if (next === 2) state.autos.buyWeapons = true;
   showEraUnlockModal(eraData);
   applyEraTheme();
-  render(); save();
+  render();
 }
 function showEraUnlockModal(eraData) {
   const bg = document.createElement('div');
@@ -2151,7 +2151,7 @@ function buyMeta(id) {
   if (owned >= u.max || state.dm < u.cost) return;
   state.dm -= u.cost;
   state.meta[id] = owned + 1;
-  render(); save();
+  render();
 }
 function buyResearch(id) {
   if (era() < 2) return;
@@ -2163,7 +2163,7 @@ function buyResearch(id) {
   state.sing -= cost;
   state.research[id] = true;
   toast(`RESEARCHED: ${node.name}`, 'gold');
-  render(); save();
+  render();
 }
 
 // ===== MAIN TICK =====
@@ -2396,17 +2396,25 @@ function renderTabs() {
 
 function renderPanel() {
   const panel = document.getElementById('panel');
+  let html;
+  let attach;
   switch (state.tab) {
-    case 'mine': panel.innerHTML = renderMine(); attachBuy(); break;
-    case 'combat': panel.innerHTML = renderCombatPanel(); attachWeapon(); break;
-    case 'expedition': panel.innerHTML = renderExpeditions(); attachExp(); break;
-    case 'research': panel.innerHTML = renderResearch(); attachResearch(); break;
-    case 'anomaly': panel.innerHTML = renderAnomaly(); attachAnom(); break;
-    case 'upgrade': panel.innerHTML = renderStats(); break;
-    case 'achv': panel.innerHTML = renderAchievements(); break;
-    case 'prestige': panel.innerHTML = renderPrestige(); attachPrestige(); break;
-    case 'meta': panel.innerHTML = renderMeta(); attachMeta(); break;
+    case 'mine': html = renderMine(); attach = attachBuy; break;
+    case 'combat': html = renderCombatPanel(); attach = attachWeapon; break;
+    case 'expedition': html = renderExpeditions(); attach = attachExp; break;
+    case 'research': html = renderResearch(); attach = attachResearch; break;
+    case 'anomaly': html = renderAnomaly(); attach = attachAnom; break;
+    case 'upgrade': html = renderStats(); break;
+    case 'achv': html = renderAchievements(); break;
+    case 'prestige': html = renderPrestige(); attach = attachPrestige; break;
+    case 'meta': html = renderMeta(); attach = attachMeta; break;
+    default: return;
   }
+  // Only replace DOM when content actually changed — prevents flicker
+  if (panel._lastHtml === html) return;
+  panel._lastHtml = html;
+  panel.innerHTML = html;
+  if (attach) attach();
 }
 function attachBulk() {
   document.querySelectorAll('#panel .bulk-btn').forEach(el => el.addEventListener('click', () => {
@@ -2417,15 +2425,15 @@ function attachBulk() {
 }
 function attachBuy() {
   attachBulk();
-  document.querySelectorAll('#panel [data-buy]').forEach(el => el.addEventListener('click', () => { if (buyMiner(el.dataset.buy)) el.classList.add('just-bought'); render(); save(); }));
-  document.querySelectorAll('#panel [data-strat-m]').forEach(el => el.addEventListener('click', () => { state.autos.buyMinersStrategy = el.dataset.stratM; render(); save(); }));
-  document.querySelectorAll('#panel [data-toggle-buy-miners]').forEach(el => el.addEventListener('click', () => { state.autos.buyMiners = !state.autos.buyMiners; render(); save(); }));
+  document.querySelectorAll('#panel [data-buy]').forEach(el => el.addEventListener('click', () => { if (buyMiner(el.dataset.buy)) el.classList.add('just-bought'); render(); }));
+  document.querySelectorAll('#panel [data-strat-m]').forEach(el => el.addEventListener('click', () => { state.autos.buyMinersStrategy = el.dataset.stratM; render(); }));
+  document.querySelectorAll('#panel [data-toggle-buy-miners]').forEach(el => el.addEventListener('click', () => { state.autos.buyMiners = !state.autos.buyMiners; render(); }));
 }
 function attachWeapon() {
   attachBulk();
-  document.querySelectorAll('#panel [data-wpn]').forEach(el => el.addEventListener('click', () => { if (buyWeapon(el.dataset.wpn)) el.classList.add('just-bought'); render(); save(); }));
-  document.querySelectorAll('#panel [data-strat-w]').forEach(el => el.addEventListener('click', () => { state.autos.buyWeaponsStrategy = el.dataset.stratW; render(); save(); }));
-  document.querySelectorAll('#panel [data-toggle-buy-weapons]').forEach(el => el.addEventListener('click', () => { state.autos.buyWeapons = !state.autos.buyWeapons; render(); save(); }));
+  document.querySelectorAll('#panel [data-wpn]').forEach(el => el.addEventListener('click', () => { if (buyWeapon(el.dataset.wpn)) el.classList.add('just-bought'); render(); }));
+  document.querySelectorAll('#panel [data-strat-w]').forEach(el => el.addEventListener('click', () => { state.autos.buyWeaponsStrategy = el.dataset.stratW; render(); }));
+  document.querySelectorAll('#panel [data-toggle-buy-weapons]').forEach(el => el.addEventListener('click', () => { state.autos.buyWeapons = !state.autos.buyWeapons; render(); }));
 }
 function attachExp() { document.querySelectorAll('#panel [data-exp]').forEach(el => el.addEventListener('click', () => startExpedition(el.dataset.exp))); }
 function attachResearch() { document.querySelectorAll('#panel [data-rs]').forEach(el => el.addEventListener('click', () => buyResearch(el.dataset.rs))); }
@@ -2469,7 +2477,7 @@ function attachPrestige() {
   };
   document.querySelectorAll('#panel [data-toggle-auto]').forEach(el => el.addEventListener('click', () => {
     state.autos[el.dataset.toggleAuto] = !state.autos[el.dataset.toggleAuto];
-    render(); save();
+    render();
   }));
 }
 function attachMeta() {
@@ -2938,8 +2946,25 @@ function renderMeta() {
   return html;
 }
 
-function render() {
+// ===== RENDER BATCHING =====
+// Best practice for incremental games: coalesce all render calls into
+// a single requestAnimationFrame to avoid redundant DOM rebuilds.
+// Any code that changes state should call render() which just sets a flag.
+// The actual DOM update happens once per frame.
+let _renderScheduled = false;
+let _saveDirty = false;
+
+function _doRender() {
+  _renderScheduled = false;
   renderResources(); renderTabs(); renderPanel(); renderCombat();
+}
+
+function render() {
+  _saveDirty = true;
+  if (!_renderScheduled) {
+    _renderScheduled = true;
+    requestAnimationFrame(_doRender);
+  }
 }
 
 // ===== EVENTS =====
@@ -3072,27 +3097,12 @@ try {
     if (splash) { splash.classList.add('fade-out'); setTimeout(() => splash.remove(), 400); }
   }, 300);
   setInterval(tick, 100);
-  setInterval(save, 5000);
-  // Track last-rendered state snapshot to avoid redundant full DOM rebuilds
-  let _lastPanelHash = '';
+  setInterval(() => { if (_saveDirty) { _saveDirty = false; save(); } }, 5000);
+  // Periodic checks — achievements and gentle render refresh
   setInterval(() => {
     checkAchievements();
-    renderTabs();
-    // Only rebuild panel innerHTML when displayed data actually changed
-    if (['mine','prestige','combat','upgrade','expedition','research','anomaly','meta','achv'].includes(state.tab)) {
-      const hash = JSON.stringify([
-        state.tab, state.ore, state.crys, state.sing, state.dm, state.scrap,
-        state.miners, state.weapons, state.kills, state.sector, state.enemyHp,
-        state.expeditions, state.research, state.anomaly, state.autos,
-        state.meta, state.refineCount, state.warpCount, state.ascendCount,
-        state.achievements, state.buffs, buyAmount,
-      ]);
-      if (hash !== _lastPanelHash) {
-        _lastPanelHash = hash;
-        renderPanel();
-      }
-    }
-  }, 700);
+    render();  // coalesced via rAF — no flicker
+  }, 1000);
   document.getElementById('status').textContent = currentUser
     ? '// ' + currentUser.email.toUpperCase()
     : '// LOCAL MODE';
