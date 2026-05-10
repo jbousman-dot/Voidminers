@@ -2272,16 +2272,19 @@ function spawnFloat(x, y, text, kind) {
 }
 
 // ===== RENDER =====
+// Set textContent only when value differs (avoids unnecessary DOM text node replacement)
+function _setText(el, val) { if (el.textContent !== val) el.textContent = val; }
+
 function renderResources() {
-  document.getElementById('ore').textContent = fmt(state.ore);
-  document.getElementById('crys').textContent = fmt(state.crys);
-  document.getElementById('sing').textContent = fmt(state.sing);
-  document.getElementById('dm').textContent = fmt(state.dm);
-  document.getElementById('scrap').textContent = fmt(state.scrap);
-  document.getElementById('ops').textContent = fmt(totalRate()) + '/s';
-  document.getElementById('tier-text').textContent = '// SECTOR ' + String(state.sector).padStart(2, '0') + ' // ERA ' + state.erasUnlocked;
-  if (state.mode === 'mine') document.getElementById('tap-power').textContent = '+' + fmt(tapPower()) + ' / TAP';
-  else document.getElementById('tap-power').textContent = fmt(tapDamage()) + ' DMG / TAP';
+  _setText(document.getElementById('ore'), fmt(state.ore));
+  _setText(document.getElementById('crys'), fmt(state.crys));
+  _setText(document.getElementById('sing'), fmt(state.sing));
+  _setText(document.getElementById('dm'), fmt(state.dm));
+  _setText(document.getElementById('scrap'), fmt(state.scrap));
+  _setText(document.getElementById('ops'), fmt(totalRate()) + '/s');
+  _setText(document.getElementById('tier-text'), '// SECTOR ' + String(state.sector).padStart(2, '0') + ' // ERA ' + state.erasUnlocked);
+  if (state.mode === 'mine') _setText(document.getElementById('tap-power'), '+' + fmt(tapPower()) + ' / TAP');
+  else _setText(document.getElementById('tap-power'), fmt(tapDamage()) + ' DMG / TAP');
   const rc = document.getElementById('row-crys');
   const rs = document.getElementById('row-scrap');
   const ri = document.getElementById('row-sing');
@@ -2292,39 +2295,63 @@ function renderResources() {
   if (rd) rd.style.display = (state.dm > 0 || state.ascendCount > 0) ? 'flex' : 'none';
 }
 
+// Cache combat DOM refs to avoid repeated lookups
+let _combatRefs = null;
+let _lastCombatState = '';
+
 function renderCombat() {
-  const core = document.getElementById('core');
-  const eInfo = document.getElementById('enemy-info');
-  const hpBar = document.getElementById('hp-bar');
-  const hpText = document.getElementById('hp-text');
-  const dpsText = document.getElementById('dps-text');
-  core.classList.remove('boss-fight', 'anomaly-fight');
+  if (!_combatRefs) {
+    _combatRefs = {
+      core: document.getElementById('core'),
+      eInfo: document.getElementById('enemy-info'),
+      hpBar: document.getElementById('hp-bar'),
+      hpText: document.getElementById('hp-text'),
+      dpsText: document.getElementById('dps-text'),
+      enemyName: document.getElementById('enemy-name'),
+      enemyTier: document.getElementById('enemy-tier'),
+      hpFill: document.getElementById('hp-fill'),
+    };
+  }
+  const { core, eInfo, hpBar, hpText, dpsText, enemyName, enemyTier, hpFill } = _combatRefs;
+
   if (state.mode === 'combat') {
-    core.classList.add('combat-mode');
-    eInfo.style.display = 'flex'; hpBar.style.display = 'block';
-    hpText.style.display = 'block'; dpsText.style.display = 'block';
     const enc = getCurrentEncounter();
+    const isBoss = enc?.isBoss || false;
+    const isAnom = enc?.isAnomaly || false;
+
+    // Only toggle classes when combat state actually changes
+    const combatKey = 'combat:' + isBoss + ':' + isAnom + ':' + (enc?.name || '');
+    if (combatKey !== _lastCombatState) {
+      _lastCombatState = combatKey;
+      core.classList.add('combat-mode');
+      core.classList.toggle('boss-fight', isBoss);
+      core.classList.toggle('anomaly-fight', isAnom);
+      eInfo.style.display = 'flex'; hpBar.style.display = 'block';
+      hpText.style.display = 'block'; dpsText.style.display = 'block';
+      if (enc) {
+        enemyName.textContent = enc.name;
+        enemyName.classList.toggle('boss', isBoss);
+        enemyName.classList.toggle('anomaly', isAnom);
+        let tierLabel = isAnom ? '\u26a1ANOMALY' : 'S' + enc.stageId + '\u00b7' + (isBoss ? 'BOSS' : 'W' + (state.currentEnemyIdx + 1));
+        enemyTier.textContent = tierLabel;
+      }
+    }
+    // Always update HP bar and DPS (fast textContent, no class changes)
     if (enc) {
-      if (enc.isAnomaly) core.classList.add('anomaly-fight');
-      else if (enc.isBoss) core.classList.add('boss-fight');
-      const name = document.getElementById('enemy-name');
-      name.textContent = enc.name;
-      name.classList.remove('boss', 'anomaly');
-      if (enc.isBoss) name.classList.add('boss');
-      if (enc.isAnomaly) name.classList.add('anomaly');
-      let tierLabel = '';
-      if (enc.isAnomaly) tierLabel = '⚡ANOMALY';
-      else tierLabel = `S${enc.stageId}·${enc.isBoss ? 'BOSS' : 'W' + (state.currentEnemyIdx + 1)}`;
-      document.getElementById('enemy-tier').textContent = tierLabel;
       const pct = Math.max(0, Math.min(100, (state.enemyHp / state.enemyMaxHp) * 100));
-      document.getElementById('hp-fill').style.width = pct + '%';
-      hpText.textContent = `${fmt(Math.max(0,state.enemyHp))} / ${fmt(state.enemyMaxHp)}`;
-      dpsText.textContent = fmt(totalDPS()) + ' DPS';
+      hpFill.style.width = pct + '%';
+      const hpStr = fmt(Math.max(0, state.enemyHp)) + ' / ' + fmt(state.enemyMaxHp);
+      if (hpText.textContent !== hpStr) hpText.textContent = hpStr;
+      const dpsStr = fmt(totalDPS()) + ' DPS';
+      if (dpsText.textContent !== dpsStr) dpsText.textContent = dpsStr;
     }
   } else {
-    core.classList.remove('combat-mode');
-    eInfo.style.display = 'none'; hpBar.style.display = 'none';
-    hpText.style.display = 'none'; dpsText.style.display = 'none';
+    if (_lastCombatState !== 'mine') {
+      _lastCombatState = 'mine';
+      core.classList.remove('combat-mode', 'boss-fight', 'anomaly-fight');
+      eInfo.style.display = 'none'; hpBar.style.display = 'none';
+      hpText.style.display = 'none'; dpsText.style.display = 'none';
+    }
   }
 }
 
@@ -2451,7 +2478,7 @@ function _updatePanelValues(tab) {
   if (tab === 'mine') {
     // Update section title rate
     const sub = document.querySelector('#panel .section-title .sub');
-    if (sub) sub.textContent = fmt(totalRate()) + '/s';
+    if (sub) _setText(sub, fmt(totalRate()) + '/s');
     // Update each miner row's cost, quantity, and affordability
     document.querySelectorAll('#panel [data-buy]').forEach(el => {
       const m = MINERS.find(x => x.id === el.dataset.buy);
@@ -2469,11 +2496,11 @@ function _updatePanelValues(tab) {
         el.classList.toggle('cant', !can);
       }
       const qtyEl = el.querySelector('.qty');
-      if (qtyEl) qtyEl.textContent = 'OWNED ' + owned + ' \u00b7 ' + fmt(out) + '/s';
+      if (qtyEl) _setText(qtyEl, 'OWNED ' + owned + ' \u00b7 ' + fmt(out) + '/s');
       const costEl = el.querySelector('.cost');
-      if (costEl) costEl.textContent = fmt(bCost);
+      if (costEl) _setText(costEl, fmt(bCost));
       const labelEl = el.querySelector('.label');
-      if (labelEl) labelEl.textContent = label;
+      if (labelEl) _setText(labelEl, label);
     });
   } else if (tab === 'combat') {
     // Update weapon rows similarly
@@ -2490,14 +2517,13 @@ function _updatePanelValues(tab) {
         el.classList.toggle('cant', !can);
       }
       const costEl = el.querySelector('.cost');
-      if (costEl) costEl.textContent = fmt(bCost);
+      if (costEl) _setText(costEl, fmt(bCost));
       const labelEl = el.querySelector('.label');
-      if (labelEl) labelEl.textContent = label;
+      if (labelEl) _setText(labelEl, label);
     });
   } else if (tab === 'prestige') {
-    // Update prestige gain values
     const sub = document.querySelector('#panel .section-title .sub');
-    if (sub) sub.textContent = fmt(state.ore) + ' ORE';
+    if (sub) _setText(sub, fmt(state.ore) + ' ORE');
   }
   // Other tabs (research, expeditions, etc.) change infrequently — full rebuild is fine
 }
