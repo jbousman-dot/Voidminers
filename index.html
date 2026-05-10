@@ -2394,27 +2394,112 @@ function renderTabs() {
   });
 }
 
+// Track which tab structure is currently in the DOM to avoid full rebuilds
+let _panelTab = null;
+let _panelStructureKey = '';
+
 function renderPanel() {
   const panel = document.getElementById('panel');
-  let html;
-  let attach;
-  switch (state.tab) {
-    case 'mine': html = renderMine(); attach = attachBuy; break;
-    case 'combat': html = renderCombatPanel(); attach = attachWeapon; break;
-    case 'expedition': html = renderExpeditions(); attach = attachExp; break;
-    case 'research': html = renderResearch(); attach = attachResearch; break;
-    case 'anomaly': html = renderAnomaly(); attach = attachAnom; break;
-    case 'upgrade': html = renderStats(); break;
-    case 'achv': html = renderAchievements(); break;
-    case 'prestige': html = renderPrestige(); attach = attachPrestige; break;
-    case 'meta': html = renderMeta(); attach = attachMeta; break;
-    default: return;
+  const tab = state.tab;
+
+  // Compute a "structure key" — things that change the DOM structure
+  // (tab, which items are unlocked, auto-buy on/off, strategy, buyAmount)
+  // but NOT continuously changing values like ore/costs
+  // Structure key: only things that add/remove DOM elements.
+  // Miner/weapon visibility is based on previous tier owned > 0,
+  // so track that as a stable list of visible item IDs.
+  const visibleMiners = MINERS.filter((m,i) => i === 0 || state.miners[MINERS[i-1].id] > 0 || state.totalOre >= m.base / 2).map(m => m.id);
+  const visibleWeapons = WEAPONS.filter(w => weaponUnlocked(w)).map(w => w.id);
+  const structKey = JSON.stringify([
+    tab, buyAmount,
+    visibleMiners, visibleWeapons,
+    state.autos.buyMiners, state.autos.buyWeapons,
+    state.autos.buyMinersStrategy, state.autos.buyWeaponsStrategy,
+    state.autos.refine, state.autos.warp, state.autos.ascend,
+    state.erasUnlocked, state.sector,
+    Object.keys(state.research), Object.keys(state.achievements).length,
+    state.pendingAnomaly ? 1 : 0,
+    Object.keys(state.expeditions).map(k => state.expeditions[k]?.active ? 1 : 0),
+  ]);
+
+  // Full rebuild only when structure changes (new tab, new unlock, setting toggle)
+  if (structKey !== _panelStructureKey) {
+    _panelStructureKey = structKey;
+    let html;
+    let attach;
+    switch (tab) {
+      case 'mine': html = renderMine(); attach = attachBuy; break;
+      case 'combat': html = renderCombatPanel(); attach = attachWeapon; break;
+      case 'expedition': html = renderExpeditions(); attach = attachExp; break;
+      case 'research': html = renderResearch(); attach = attachResearch; break;
+      case 'anomaly': html = renderAnomaly(); attach = attachAnom; break;
+      case 'upgrade': html = renderStats(); break;
+      case 'achv': html = renderAchievements(); break;
+      case 'prestige': html = renderPrestige(); attach = attachPrestige; break;
+      case 'meta': html = renderMeta(); attach = attachMeta; break;
+      default: return;
+    }
+    panel.innerHTML = html;
+    if (attach) attach();
   }
-  // Only replace DOM when content actually changed — prevents flicker
-  if (panel._lastHtml === html) return;
-  panel._lastHtml = html;
-  panel.innerHTML = html;
-  if (attach) attach();
+
+  // Fast path: update only dynamic text values without touching DOM structure
+  _updatePanelValues(tab);
+}
+
+function _updatePanelValues(tab) {
+  if (tab === 'mine') {
+    // Update section title rate
+    const sub = document.querySelector('#panel .section-title .sub');
+    if (sub) sub.textContent = fmt(totalRate()) + '/s';
+    // Update each miner row's cost, quantity, and affordability
+    document.querySelectorAll('#panel [data-buy]').forEach(el => {
+      const m = MINERS.find(x => x.id === el.dataset.buy);
+      if (!m) return;
+      const owned = state.miners[m.id];
+      const bCount = buyAmount === 'max' ? maxAffordable(minerCost, m, owned, state.ore) : buyAmount;
+      const bCost = bulkCost(minerCost, m, owned, bCount);
+      const can = bCount > 0 && state.ore >= bCost;
+      const out = m.rate * owned * globalMult() * (1 + bonusFromResearch('mineRate'));
+      const label = buyAmount === 'max' ? (bCount > 0 ? 'x' + bCount : 'MAX') : (buyAmount > 1 ? 'x' + buyAmount : 'COST');
+      // Update class without triggering layout
+      const shouldBeAffordable = can ? 'affordable' : 'cant';
+      if (el.classList.contains('affordable') !== can) {
+        el.classList.toggle('affordable', can);
+        el.classList.toggle('cant', !can);
+      }
+      const qtyEl = el.querySelector('.qty');
+      if (qtyEl) qtyEl.textContent = 'OWNED ' + owned + ' \u00b7 ' + fmt(out) + '/s';
+      const costEl = el.querySelector('.cost');
+      if (costEl) costEl.textContent = fmt(bCost);
+      const labelEl = el.querySelector('.label');
+      if (labelEl) labelEl.textContent = label;
+    });
+  } else if (tab === 'combat') {
+    // Update weapon rows similarly
+    document.querySelectorAll('#panel [data-wpn]').forEach(el => {
+      const w = WEAPONS.find(x => x.id === el.dataset.wpn);
+      if (!w) return;
+      const owned = state.weapons[w.id];
+      const bCount = buyAmount === 'max' ? maxAffordable(weaponCost, w, owned, state.scrap) : buyAmount;
+      const bCost = bulkCost(weaponCost, w, owned, bCount);
+      const can = bCount > 0 && state.scrap >= bCost;
+      const label = buyAmount === 'max' ? (bCount > 0 ? 'x' + bCount : 'MAX') : (buyAmount > 1 ? 'x' + buyAmount : 'COST');
+      if (el.classList.contains('affordable') !== can) {
+        el.classList.toggle('affordable', can);
+        el.classList.toggle('cant', !can);
+      }
+      const costEl = el.querySelector('.cost');
+      if (costEl) costEl.textContent = fmt(bCost);
+      const labelEl = el.querySelector('.label');
+      if (labelEl) labelEl.textContent = label;
+    });
+  } else if (tab === 'prestige') {
+    // Update prestige gain values
+    const sub = document.querySelector('#panel .section-title .sub');
+    if (sub) sub.textContent = fmt(state.ore) + ' ORE';
+  }
+  // Other tabs (research, expeditions, etc.) change infrequently — full rebuild is fine
 }
 function attachBulk() {
   document.querySelectorAll('#panel .bulk-btn').forEach(el => el.addEventListener('click', () => {
