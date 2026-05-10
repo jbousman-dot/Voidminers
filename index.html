@@ -15,6 +15,7 @@
 <title>VOID MINERS // Deep Space Idle</title>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=JetBrains+Mono:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -996,6 +997,7 @@ display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;
       <button id="mute-btn" title="Toggle ambient music">♪ ON</button>
       <button id="export-btn" title="Copy save code to clipboard">EXPORT</button>
       <button id="import-btn" title="Paste a save code">IMPORT</button>
+      <button id="auth-btn" title="Sign in with Google for cloud sync">☁ SYNC</button>
       <button id="reset-btn">RESET</button>
     </span>
   </footer>
@@ -1023,14 +1025,89 @@ firebase.initializeApp({
 const db = firebase.firestore();
 
 let currentUser = null;
-function getCFUser() {
-  const cookie = document.cookie.split(';').find(c => c.trim().startsWith('CF_Authorization='));
-  if (!cookie) return null;
+const auth = firebase.auth();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+async function initAuth() {
+  return new Promise((resolve) => {
+    const unsub = auth.onAuthStateChanged(async (user) => {
+      unsub();
+      if (user) {
+        currentUser = { uid: user.uid, email: user.email || 'anonymous', isAnonymous: user.isAnonymous };
+      } else {
+        try {
+          const cred = await auth.signInAnonymously();
+          currentUser = { uid: cred.user.uid, email: 'anonymous', isAnonymous: true };
+        } catch(e) {
+          console.warn('Anonymous auth failed:', e);
+          currentUser = null;
+        }
+      }
+      updateAuthUI();
+      resolve();
+    });
+  });
+}
+
+async function signInWithGoogle() {
   try {
-    const token = cookie.split('=')[1];
-    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
-    return { email: payload.email, uid: payload.sub };
-  } catch(e) { return null; }
+    if (currentUser && auth.currentUser && auth.currentUser.isAnonymous) {
+      await auth.currentUser.linkWithPopup(googleProvider);
+      currentUser.email = auth.currentUser.email;
+      currentUser.isAnonymous = false;
+    } else {
+      await auth.signInWithPopup(googleProvider);
+      currentUser = { uid: auth.currentUser.uid, email: auth.currentUser.email, isAnonymous: false };
+    }
+    updateAuthUI();
+    toast('SIGNED IN: ' + auth.currentUser.email.toUpperCase(), 'green');
+    cloudSave();
+  } catch(e) {
+    if (e.code === 'auth/credential-already-in-use') {
+      if (confirm('This Google account already has a save. Load it? (Current anonymous progress will be lost)')) {
+        const cred = e.credential;
+        await auth.signInWithCredential(cred);
+        currentUser = { uid: auth.currentUser.uid, email: auth.currentUser.email, isAnonymous: false };
+        const cloudState = await cloudLoad();
+        if (cloudState) {
+          const fresh = freshState();
+          state = Object.assign(fresh, cloudState);
+          for (const m of MINERS) if (state.miners[m.id] === undefined) state.miners[m.id] = 0;
+          for (const w of WEAPONS) if (state.weapons[w.id] === undefined) state.weapons[w.id] = 0;
+          for (const m of META) if (state.meta[m.id] === undefined) state.meta[m.id] = 0;
+          if (!state.achievements) state.achievements = {};
+          if (!state.autos) state.autos = freshState().autos;
+        }
+        render();
+        updateAuthUI();
+        toast('LOADED CLOUD SAVE', 'green');
+      }
+    } else {
+      console.warn('Google sign-in failed:', e);
+      toast('SIGN-IN FAILED', 'bad');
+    }
+  }
+}
+
+function signOutUser() {
+  auth.signOut();
+  currentUser = null;
+  updateAuthUI();
+  toast('SIGNED OUT — PLAYING LOCALLY', 'green');
+}
+
+function updateAuthUI() {
+  const statusEl = document.getElementById('status');
+  const authBtn = document.getElementById('auth-btn');
+  if (currentUser && !currentUser.isAnonymous) {
+    if (statusEl) statusEl.textContent = '// ' + currentUser.email.toUpperCase();
+    if (authBtn) { authBtn.textContent = 'SIGN OUT'; authBtn.onclick = signOutUser; }
+  } else {
+    if (statusEl) statusEl.textContent = '// LOCAL MODE';
+    if (authBtn) { authBtn.textContent = '☁ SYNC'; authBtn.onclick = signInWithGoogle; }
+  }
+  const cloudEl = document.getElementById('cloud-status');
+  if (cloudEl) cloudEl.textContent = currentUser ? (currentUser.isAnonymous ? '' : 'CLOUD: ACTIVE') : '';
 }
 
 function getUserDocRef() {
@@ -3163,8 +3240,8 @@ try {
 } catch (e) {}
 
 (async function init() {
-  // Identify user from Cloudflare Access JWT
-  currentUser = getCFUser();
+  // Firebase Auth — anonymous first, silent, zero friction
+  await initAuth();
 
   // Try cloud load first, then localStorage fallback
   let loaded = false;
@@ -3206,9 +3283,7 @@ try {
     checkAchievements();
     render();  // coalesced via rAF — no flicker
   }, 1000);
-  document.getElementById('status').textContent = currentUser
-    ? '// ' + currentUser.email.toUpperCase()
-    : '// LOCAL MODE';
+  updateAuthUI();
 })();
 
 window.addEventListener('pagehide', () => { save(); if (currentUser) cloudSave(); });
