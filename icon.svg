@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0a0e1f"/>
+      <stop offset="100%" stop-color="#05060d"/>
+    </radialGradient>
+    <radialGradient id="orb" cx="38%" cy="35%" r="45%">
+      <stop offset="0%" stop-color="#aff5ff"/>
+      <stop offset="25%" stop-color="#6ef0ff"/>
+      <stop offset="60%" stop-color="#1a4a6a"/>
+      <stop offset="100%" stop-color="#08151f"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(110,240,255,0.5)"/>
+      <stop offset="60%" stop-color="rgba(110,240,255,0.15)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <filter id="blur">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="12"/>
+    </filter>
+    <filter id="glow-filter">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4"/>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <!-- Stars -->
+  <circle cx="80" cy="90" r="1.5" fill="#fff" opacity="0.8"/>
+  <circle cx="420" cy="60" r="1" fill="#b9e6ff" opacity="0.7"/>
+  <circle cx="140" cy="380" r="1.5" fill="#fff" opacity="0.6"/>
+  <circle cx="380" cy="420" r="1" fill="#ffd6f5" opacity="0.5"/>
+  <circle cx="60" cy="280" r="1" fill="#fff" opacity="0.7"/>
+  <circle cx="450" cy="200" r="1.5" fill="#b9e6ff" opacity="0.6"/>
+  <circle cx="300" cy="80" r="1" fill="#fff" opacity="0.5"/>
+  <circle cx="180" cy="450" r="1" fill="#fff" opacity="0.4"/>
+  <circle cx="350" cy="350" r="1.5" fill="#fff" opacity="0.3"/>
+  <circle cx="100" cy="180" r="1" fill="#b9e6ff" opacity="0.5"/>
+  <!-- Outer glow -->
+  <circle cx="256" cy="240" r="120" fill="url(#glow)" filter="url(#blur)"/>
+  <!-- Orbit ring -->
+  <ellipse cx="256" cy="240" rx="130" ry="130" fill="none" stroke="rgba(110,240,255,0.2)" stroke-width="1" stroke-dasharray="8 12"/>
+  <!-- Second orbit ring -->
+  <ellipse cx="256" cy="240" rx="100" ry="100" fill="none" stroke="rgba(255,215,106,0.12)" stroke-width="1" stroke-dasharray="4 8" transform="rotate(45 256 240)"/>
+  <!-- Main orb -->
+  <circle cx="256" cy="240" r="72" fill="url(#orb)"/>
+  <!-- Orb highlight -->
+  <ellipse cx="236" cy="216" rx="28" ry="20" fill="rgba(255,255,255,0.15)" transform="rotate(-20 236 216)"/>
+  <!-- Orb inner shadow -->
+  <circle cx="256" cy="240" r="72" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="2"/>
+  <!-- Cyan glow ring around orb -->
+  <circle cx="256" cy="240" r="76" fill="none" stroke="rgba(110,240,255,0.4)" stroke-width="1.5" filter="url(#glow-filter)"/>
+  <!-- Small orbiting dot -->
+  <circle cx="340" cy="170" r="4" fill="#6ef0ff" opacity="0.9"/>
+  <circle cx="340" cy="170" r="8" fill="rgba(110,240,255,0.3)" filter="url(#glow-filter)"/>
+  <!-- Title text -->
+  <text x="256" y="380" text-anchor="middle" fill="#6ef0ff" font-family="monospace" font-size="36" font-weight="700" letter-spacing="6">VOID</text>
+  <text x="256" y="416" text-anchor="middle" fill="rgba(110,240,255,0.5)" font-family="monospace" font-size="18" font-weight="400" letter-spacing="10">MINERS</text>
+</svg>
