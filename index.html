@@ -257,13 +257,13 @@ animation: anomalyThrob 1.5s ease-in-out infinite !important;
 }
 
 .enemy-info {
-position: absolute; inset: 4px 10px auto 80px; z-index: 3;
-display: flex; justify-content: space-between; align-items: baseline;
+position: absolute; top: 5px; right: 10px; z-index: 3;
+display: flex; align-items: baseline; gap: 6px;
 }
-.enemy-name { font-size: 11px; color: var(--crimson); letter-spacing: 0.1em; font-weight: 600; text-shadow: 0 0 6px rgba(255,94,108,0.5); }
+.enemy-name { font-size: 11px; color: var(--crimson); letter-spacing: 0.1em; font-weight: 600; text-shadow: 0 0 6px rgba(255,94,108,0.5); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .enemy-name.boss { color: var(--gold); text-shadow: 0 0 8px rgba(255,215,106,0.6); }
 .enemy-name.anomaly { color: var(--violet); text-shadow: 0 0 8px rgba(180,138,255,0.7); }
-.enemy-tier { font-size: 10px; color: var(--ink-dim); }
+.enemy-tier { font-size: 9px; color: var(--ink-dim); white-space: nowrap; }
 
 /* HP bar — full bottom strip, separated from orb */
 .hp-bar {
@@ -402,7 +402,7 @@ display: inline-block; min-width: 12px; padding: 0 3px;
 background: var(--magenta); color: #fff; font-size: 9px;
 border-radius: 2px; margin-left: 2px;
 }
-.tab.locked { opacity: 0.3; cursor: not-allowed; }
+/* locked tabs are now hidden entirely, not shown greyed out */
 .tab .badge.violet { background: var(--violet); animation: badgePulse 1.2s infinite; }
 .tab .badge.green { background: var(--green); color: #000; }
 .tab .badge.gold { background: var(--gold); color: #000; }
@@ -2372,6 +2372,8 @@ function renderTabs() {
     const locked = (t.minEra && era() < t.minEra) ||
                    (t.id === 'combat' && state.totalOre < 30 && state.kills === 0 && state.weapons.laser === 0) ||
                    (t.id === 'meta' && state.dm <= 0 && state.ascendCount === 0);
+    // Hide locked tabs entirely — cleaner than greyed-out clutter
+    if (locked) continue;
     let badge = '';
     if (t.id === 'prestige') {
       const ag = ascendGain(), wg = warpGain(), rg = refineGain();
@@ -2385,7 +2387,7 @@ function renderTabs() {
     }
     if (t.id === 'anomaly' && state.pendingAnomaly) badge = ' <span class="badge violet">★</span>';
     if (t.id === 'expedition' && Object.values(state.expeditions).some(e => e.active)) badge = ' <span class="badge green">●</span>';
-    html += `<button class="tab ${t.cls} ${state.tab === t.id ? 'active' : ''} ${locked ? 'locked' : ''}" data-tab="${t.id}">${t.label}${badge}</button>`;
+    html += `<button class="tab ${t.cls} ${state.tab === t.id ? 'active' : ''}" data-tab="${t.id}">${t.label}${badge}</button>`;
   }
   // Skip DOM rebuild if tabs haven't changed
   const tabsEl = document.getElementById('tabs');
@@ -2394,18 +2396,6 @@ function renderTabs() {
   tabsEl.innerHTML = html;
   document.querySelectorAll('#tabs .tab').forEach(el => {
     el.addEventListener('click', () => {
-      if (el.classList.contains('locked')) {
-        const id = el.dataset.tab;
-        const reasons = {
-          combat: 'EARN 30 ORE OR BUY A WEAPON FIRST',
-          expedition: 'UNLOCK ERA 1 TO ACCESS EXPEDITIONS',
-          research: 'UNLOCK ERA 2 TO ACCESS RESEARCH',
-          anomaly: 'UNLOCK ERA 3 TO ACCESS ANOMALIES',
-          meta: 'ASCEND FIRST TO UNLOCK META'
-        };
-        toast(reasons[id] || 'LOCKED', 'bad');
-        return;
-      }
       state.tab = el.dataset.tab;
       if (state.tab === 'combat') {
         state.mode = 'combat';
